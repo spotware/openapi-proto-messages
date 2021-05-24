@@ -1,0 +1,3 @@
+site/*
+/.vs/*
+/docs/.vs

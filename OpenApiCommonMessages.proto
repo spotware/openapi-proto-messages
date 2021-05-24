@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+option java_multiple_files = true;
+option java_generate_equals_and_hash = true;
+option java_package = "com.xtrader.protocol.proto.commons";
+option java_outer_classname = "ContainerCommonMessages";
+
+import "OpenApiCommonModelMessages.proto";
+
+
+message ProtoMessage {
+    required uint32 payloadType = 1; // Contains id of ProtoPayloadType or other custom PayloadTypes (e.g. ProtoOAPayloadType)
+    optional bytes payload = 2;      // Serialized protobuf message that corresponds to payloadType
+    optional string clientMsgId = 3; // Request message id, assigned by the client that will be returned in the response
+}
+
+message ProtoErrorRes {
+    optional ProtoPayloadType payloadType = 1 [default = ERROR_RES];
+    
+    required string errorCode = 2;   // Contains name of ProtoErrorCode or other custom ErrorCodes (e.g. ProtoCHErrorCode)
+    optional string description = 3; // Error description
+    optional uint64 maintenanceEndTimestamp = 4; // CS-10489 Epoch timestamp in second
+}
+
+/** Event that is sent from Open API proxy and can be used as criteria that connection is healthy when no other messages are sent by cTrader platform. Open API client can send this message when he needs to keep the connection open for a period without other messages longer than 30 seconds */
+message ProtoHeartbeatEvent {
+    optional ProtoPayloadType payloadType = 1 [default = HEARTBEAT_EVENT];
+}
+
