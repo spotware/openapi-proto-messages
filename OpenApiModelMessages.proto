@@ -84,6 +84,8 @@ enum ProtoOAPayloadType {
     PROTO_OA_MARGIN_CALL_TRIGGER_EVENT = 2172;
     PROTO_OA_REFRESH_TOKEN_REQ = 2173;
     PROTO_OA_REFRESH_TOKEN_RES = 2174;
+    PROTO_OA_ORDER_LIST_REQ = 2175;
+    PROTO_OA_ORDER_LIST_RES = 2176;
 }
 
 /** Asset entity. */
@@ -125,10 +127,11 @@ message ProtoOASymbol {
     optional ProtoOATradingMode tradingMode = 27 [default = ENABLED]; // Rules for trading with the symbol. See ProtoOATradingMode for details.
     optional ProtoOADayOfWeek rolloverCommission3Days = 28 [default = MONDAY]; // Day of the week (in UTC) when Administrative Fee charge amount will be tripled. Applied only if RolloverChargePeriod = 0 or 1
     optional ProtoOASwapCalculationType swapCalculationType = 29 [default = PIPS]; // Specifies type of SWAP computation as PIPS (0) or PERCENTAGE (1, annual, in percent)
-    optional int64 lotSize = 30; // Lot size of the Symbol (in cents)
+    optional int64 lotSize = 30; // Lot size of the Symbol (in cents).
     optional int64 preciseTradingCommissionRate = 31; // Commission base amount. Total commission depends on commissionType: for non-percentage types it is multiplied by 10^8.
     optional int64 preciseMinCommission = 32; // Minimum commission amount per trade multiplied by 10^8.
     repeated ProtoOAHoliday holiday = 33; // List of holidays for this symbol specified by broker.
+    optional int32 pnlConversionFeeRate = 34; // Percentage (1 = 0.01%) of the realized Gross Profit, which will be paid by the Trader for any trade if the Quote Asset of the traded Symbol is not matched with the Deposit Asset.
 }
 
 /** Lightweight symbol entity. */
@@ -436,16 +439,16 @@ enum ProtoOAChangeBalanceType {
     BALANCE_DEPOSIT_MANAGEMENT_FEE = 27; // Mirroring commission.
     BALANCE_WITHDRAW_MANAGEMENT_FEE = 28; // Mirroring commission. Deprecated since 7.1 in favor of BALANCE_WITHDRAW_COPY_FEE (34).
     BALANCE_DEPOSIT_PERFORMANCE_FEE = 29; // Mirroring commission.
-    BALANCE_WITHDRAW_FOR_SUBACCOUNT = 30;
-    BALANCE_DEPOSIT_TO_SUBACCOUNT = 31;
-    BALANCE_WITHDRAW_FROM_SUBACCOUNT = 32;
-    BALANCE_DEPOSIT_FROM_SUBACCOUNT = 33;
+    BALANCE_WITHDRAW_FOR_SUBACCOUNT = 30; // Withdraw for subaccount creation (cTrader Copy).
+    BALANCE_DEPOSIT_TO_SUBACCOUNT = 31; // Deposit to subaccount on creation (cTrader Copy).
+    BALANCE_WITHDRAW_FROM_SUBACCOUNT = 32; // Manual user's withdraw from subaccount (cTrader Copy), to parent account.
+    BALANCE_DEPOSIT_FROM_SUBACCOUNT = 33; // Manual user's deposit to subaccount (cTrader Copy), from parent account.
     BALANCE_WITHDRAW_COPY_FEE = 34; // Withdrawal fees to Strategy Provider.
-    BALANCE_WITHDRAW_INACTIVITY_FEE = 35; // Withdraw of inactivity fee from the balance
-    BALANCE_DEPOSIT_TRANSFER = 36;
-    BALANCE_WITHDRAW_TRANSFER = 37;
-    BALANCE_DEPOSIT_CONVERTED_BONUS = 38;
-    BALANCE_DEPOSIT_NEGATIVE_BALANCE_PROTECTION = 39;
+    BALANCE_WITHDRAW_INACTIVITY_FEE = 35; // Withdraw of inactivity fee from the balance.
+    BALANCE_DEPOSIT_TRANSFER = 36; // Deposit within the same server (from another account).
+    BALANCE_WITHDRAW_TRANSFER = 37; // Withdraw within the same server (to another account).
+    BALANCE_DEPOSIT_CONVERTED_BONUS = 38; // Bonus being converted from virtual bonus to real deposit.
+    BALANCE_DEPOSIT_NEGATIVE_BALANCE_PROTECTION = 39; // Applies if negative balance protection is configured by broker, should make balance = 0.
 }
 
 /** Execution entity. */
@@ -489,7 +492,8 @@ message ProtoOAClosePositionDetail {
     optional double quoteToDepositConversionRate = 6; // Quote/Deposit currency conversion rate on the time of closing deal execution.
     optional int64 closedVolume = 7; // Closed volume in cents.
     optional int64 balanceVersion = 8; // Balance version of the account related to closing deal operation.
-    optional uint32 moneyDigits = 9; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects grossProfit, swap, commission, balance.
+    optional uint32 moneyDigits = 9; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects grossProfit, swap, commission, balance, pnlConversionFee.
+    optional int64 pnlConversionFee = 10; // Fee for conversion applied to the Deal in account's ccy when trader symbol's quote asset id <> ProtoOATrader.depositAssetId.
 }
 
 /** Trendbar period ENUM. */
@@ -556,8 +560,8 @@ message ProtoOACtidTraderAccount {
     required uint64 ctidTraderAccountId = 1; // Unique identifier of the trader's account. Used to match responses to trader's accounts.cTrader platform. Different brokers might have different ids
     optional bool isLive = 2; // If TRUE then the account is belong to Live environment and live host must be used to authorize it
     optional int64 traderLogin = 3; // TraderLogin for a specific account. Value is displayed on Client App UI
-    optional int64 lastClosingDealTimestamp = 4;
-    optional int64 lastBalanceUpdateTimestamp = 5;
+    optional int64 lastClosingDealTimestamp = 4; // Timestamp of the last ProtoOAClosePositionDetail happened to this account.
+    optional int64 lastBalanceUpdateTimestamp = 5; // Timestamp of the last ProtoOADepositWithdraw happened to this account.
 }
 
 /** Asset class entity. */
@@ -590,6 +594,7 @@ enum ProtoOANotificationType {
 
 /** Error code ENUM. */
 enum ProtoOAErrorCode {
+    //Authorization
     OA_AUTH_TOKEN_EXPIRED = 1; // When token used for account authorization is expired.
     ACCOUNT_NOT_AUTHORIZED = 2; // When account is not authorized.
     ALREADY_LOGGED_IN = 14; // When client tries to authorize after it was already authorized
@@ -600,17 +605,23 @@ enum ProtoOAErrorCode {
     CH_SERVER_NOT_REACHABLE = 105; // Trading service is not available.
     CH_CTID_TRADER_ACCOUNT_NOT_FOUND = 106; // Trading account is not found.
     CH_OA_CLIENT_NOT_FOUND = 107; // Could not find this client id.
+
+    //General
     REQUEST_FREQUENCY_EXCEEDED = 108; // Request frequency is reached.
     SERVER_IS_UNDER_MAINTENANCE = 109; // Server is under maintenance.
     CHANNEL_IS_BLOCKED = 110; // Operations are not allowed for this account.
     CONNECTIONS_LIMIT_EXCEEDED = 67; // Limit of connections is reached for this Open API client.
     WORSE_GSL_NOT_ALLOWED = 68; // Not allowed to increase risk for Positions with Guaranteed Stop Loss.
     SYMBOL_HAS_HOLIDAY = 69; // Trading disabled because symbol has holiday.
+
+    //Pricing
     NOT_SUBSCRIBED_TO_SPOTS = 112; // When trying to subscribe to depth, trendbars, etc. without spot subscription.
     ALREADY_SUBSCRIBED = 113; // When subscription is requested for an active.
     SYMBOL_NOT_FOUND = 114; // Symbol not found.
     UNKNOWN_SYMBOL = 115; // Note: to be merged with SYMBOL_NOT_FOUND.
     INCORRECT_BOUNDARIES = 35; // When requested period (from,to) is too large or invalid values are set to from/to.
+
+    //Trading
     NO_QUOTES = 117; // Trading cannot be done as not quotes are available. Applicable for Book B.
     NOT_ENOUGH_MONEY = 118; // Not enough funds to allocate margin.
     MAX_EXPOSURE_REACHED = 119; // Max exposure limit is reached for a {trader, symbol, side}.

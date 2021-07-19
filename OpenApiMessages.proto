@@ -199,7 +199,7 @@ message ProtoOASymbolsListReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_SYMBOLS_LIST_REQ];
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
-    optional bool includeArchivedSymbols = 3 [default = false];
+    optional bool includeArchivedSymbols = 3 [default = false]; // Whether to include old archived symbols into response.
 }
 
 /** Response to the ProtoOASymbolsListReq request. */
@@ -337,6 +337,24 @@ message ProtoOADealListRes {
     required bool hasMore = 4; // If TRUE then the response will provide more than 10000 deals.
 }
 
+/** Request for getting Trader's closed orders filtered by timestamp */
+message ProtoOAOrderListReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ORDER_LIST_REQ];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    required int64 fromTimestamp = 3; // The UNIX time from which the search starts >=0 (1-1-1970). Validation: toTimestamp - fromTimestamp <= 604800000 (1 week).
+    required int64 toTimestamp = 4; // The UNIX time where to stop searching <= 2147483646000 (19-1-2038).
+}
+
+/** The response to the ProtoOAOrderListReq request. */
+message ProtoOAOrderListRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ORDER_LIST_RES];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    repeated ProtoOAOrder order = 3; // The list of the orders.
+    required bool hasMore = 4; // If TRUE then the response will provide more than 10000 orders.
+}
+
 /** Request for getting the margin estimate. Can be used before sending a new order request. */
 message ProtoOAExpectedMarginReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_EXPECTED_MARGIN_REQ];
@@ -346,7 +364,7 @@ message ProtoOAExpectedMarginReq {
     repeated int64 volume = 4; // Volume represented in 0.01 of a unit (e.g. cents).
 }
 
-/**The response to the ProtoOAExpectedMarginReq request. */
+/** The response to the ProtoOAExpectedMarginReq request. */
 message ProtoOAExpectedMarginRes {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_EXPECTED_MARGIN_RES];
 
