@@ -323,6 +323,7 @@ message ProtoOAPosition {
     optional uint64 usedMargin = 13; // Amount of margin used for the position in deposit currency.
     optional ProtoOAOrderTriggerMethod stopLossTriggerMethod = 14 [default = TRADE]; // Stop trigger method for SL/TP of the position.
     optional uint32 moneyDigits = 15; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects swap, commission, mirroringCommission, usedMargin.
+    optional bool trailingStopLoss = 16; //If TRUE then the Trailing Stop Loss is applied.
 }
 
 /** Position/order trading details entity. */

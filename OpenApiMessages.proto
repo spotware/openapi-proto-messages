@@ -429,8 +429,8 @@ message ProtoOARefreshTokenRes {
 
     required string accessToken = 2; // The Access Token issued for providing access to the Trader's Account.
     required string tokenType = 3; // bearer
-    required int64 expiresIn = 4; // Access Token expiration in seconds
-    required string refreshToken = 5;
+    required int64 expiresIn = 4; // Access Token expiration in seconds.
+    required string refreshToken = 5; // Your new Refresh Token.
 }
 
 //+------------------------------------------------------------------+
@@ -442,6 +442,7 @@ message ProtoOASubscribeSpotsReq {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated int64 symbolId = 3; // Unique identifier of the Symbol in cTrader platform.
+    optional bool subscribeToSpotTimestamp = 4; // If TRUE you will also receive the timestamp in ProtoOASpotEvent.
 }
 
 /** Response to the ProtoOASubscribeSpotsReq request. */
@@ -475,7 +476,8 @@ message ProtoOASpotEvent {
     optional uint64 bid = 4; // Bid price. Specified in 1/100_000 of unit of a price. (e.g. 1.23 -> 123_000)
     optional uint64 ask = 5; // Ask price. Specified in 1/100_000 of unit of a price.
     repeated ProtoOATrendbar trendbar = 6; // Returns live trend bar. Requires subscription on the trend bars.
-    optional uint64 sessionClose = 7;//Last session close. Specified in 1/100_000 of unit of a price.
+    optional uint64 sessionClose = 7;// Last session close. Specified in 1/100_000 of unit of a price.
+    optional int64 timestamp = 8; // The UNIX timestamp for spot.
 }
 
 /** Request for subscribing for live trend bars. Requires subscription on the spot events, see ProtoOASubscribeSpotsReq. */
@@ -519,6 +521,7 @@ message ProtoOAGetTrendbarsReq {
     required int64 toTimestamp = 4; // The exact time of finishing the search in milliseconds. Smaller or equal to 2147483646000 (19-1-2038).
     required ProtoOATrendbarPeriod period = 5; // Specifies period of trend bar series (e.g. M1, M10, etc.).
     required int64 symbolId = 6; // Unique identifier of the Symbol in cTrader platform.
+    optional uint32 count = 7; // Limit number of trend bars in response back from toTimestamp.
 }
 
 /** Response to the ProtoOAGetTrendbarsReq request. */
