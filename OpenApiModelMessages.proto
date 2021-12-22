@@ -86,6 +86,8 @@ enum ProtoOAPayloadType {
     PROTO_OA_REFRESH_TOKEN_RES = 2174;
     PROTO_OA_ORDER_LIST_REQ = 2175;
     PROTO_OA_ORDER_LIST_RES = 2176;
+    PROTO_OA_GET_DYNAMIC_LEVERAGE_REQ = 2177;
+    PROTO_OA_GET_DYNAMIC_LEVERAGE_RES = 2178;
 }
 
 /** Asset entity. */
@@ -132,6 +134,9 @@ message ProtoOASymbol {
     optional int64 preciseMinCommission = 32; // Minimum commission amount per trade multiplied by 10^8.
     repeated ProtoOAHoliday holiday = 33; // List of holidays for this symbol specified by broker.
     optional int32 pnlConversionFeeRate = 34; // Percentage (1 = 0.01%) of the realized Gross Profit, which will be paid by the Trader for any trade if the Quote Asset of the traded Symbol is not matched with the Deposit Asset.
+    optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/ctrader/trading/dynamic-leverage
+    optional int32 swapPeriod = 36; // swap is calculated every swapPeriod hours
+    optional int32 swapTime = 37; // from which swap period is calculated, in minutes from 00:00.
 }
 
 /** Lightweight symbol entity. */
@@ -660,4 +665,14 @@ message ProtoOAHoliday {
     required bool isRecurring = 6; // If TRUE, then the holiday happens each year.
     optional int32 startSecond = 7; // Amount of seconds from 00:00:00 of the holiday day when holiday actually starts.
     optional int32 endSecond = 8; // Amount of seconds from 00:00:00 of the holiday day when holiday actually finishes.
+}
+
+message ProtoOADynamicLeverage {
+    required int64 leverageId = 1; // Unique ID of dynamic leverage.
+    repeated ProtoOADynamicLeverageTier tiers = 2; // Tiers sorted by volume. Last tier's leverage is applied also to volume above specified.
+}
+
+message ProtoOADynamicLeverageTier {
+    required int64 volume = 1; // Max USD volume (in cents) of the Open Position (per side) to apply specified leverage. Last tier's leverage is applied also to volume above specified.
+    required int32 leverage = 2; // Applied leverage.
 }

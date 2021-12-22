@@ -467,7 +467,9 @@ message ProtoOAUnsubscribeSpotsRes {
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
 }
 
-/** Event that is sent when a new spot event is generated on the server side. Requires subscription on the spot events, see ProtoOASubscribeSpotsReq. */
+/** Event that is sent when a new spot event is generated on the server side. 
+Requires subscription on the spot events, see ProtoOASubscribeSpotsReq. 
+First event, received after subscription will contain latest spot prices even if market is closed */
 message ProtoOASpotEvent {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_SPOT_EVENT];
 
@@ -691,4 +693,20 @@ message ProtoOAMarginCallTriggerEvent {
 
     required int64 ctidTraderAccountId = 2;
     required ProtoOAMarginCall marginCall = 3;
+}
+
+/** Request for getting a dynamic leverage entity referenced in ProtoOASymbol.leverageId. */
+message ProtoOAGetDynamicLeverageByIDReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_GET_DYNAMIC_LEVERAGE_REQ];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    required int64 leverageId = 3;
+}
+
+/** Response to the ProtoOAGetDynamicLeverageByIDReq request. */
+message ProtoOAGetDynamicLeverageByIDRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_GET_DYNAMIC_LEVERAGE_RES];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    required ProtoOADynamicLeverage leverage = 3;
 }
