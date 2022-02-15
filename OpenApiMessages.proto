@@ -467,9 +467,7 @@ message ProtoOAUnsubscribeSpotsRes {
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
 }
 
-/** Event that is sent when a new spot event is generated on the server side. 
-Requires subscription on the spot events, see ProtoOASubscribeSpotsReq. 
-First event, received after subscription will contain latest spot prices even if market is closed */
+/** Event that is sent when a new spot event is generated on the server side. Requires subscription on the spot events, see ProtoOASubscribeSpotsReq. First event, received after subscription will contain latest spot prices even if market is closed. */
 message ProtoOASpotEvent {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_SPOT_EVENT];
 
@@ -553,7 +551,7 @@ message ProtoOAGetTickDataRes {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_GET_TICKDATA_RES];
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
-    repeated ProtoOATickData tickData = 3; // The list of ticks.
+    repeated ProtoOATickData tickData = 3; // The list of ticks in chronological order. The first tick contains Unix timestamp in milliseconds while all subsequent ticks have the time difference in milliseconds between previous and the current one.
     required bool hasMore = 4; // If TRUE then the number of records by filter is larger than chunkSize, the response contains the number of records that is equal to chunkSize.
 }
 
@@ -644,8 +642,7 @@ message ProtoOAAccountLogoutRes {
     required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
 }
 
-/** Event that is sent when the established session for an account is dropped on the server side.
- A new session must be authorized for the account.  */
+/** Event that is sent when the established session for an account is dropped on the server side. A new session must be authorized for the account.  */
 message ProtoOAAccountDisconnectEvent {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ACCOUNT_DISCONNECT_EVENT];
 
@@ -709,4 +706,23 @@ message ProtoOAGetDynamicLeverageByIDRes {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     required ProtoOADynamicLeverage leverage = 3;
+}
+
+/** Request for retrieving the deals related to a position. */
+message ProtoOADealListByPositionIdReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_DEAL_LIST_BY_POSITION_ID_REQ];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    required int64 positionId = 3; // The unique ID of the position.
+    required int64 fromTimestamp = 4; // The exact time of starting the search in milliseconds. Must be bigger of equal to zero (1-1-1970). Validation: toTimestamp - fromTimestamp <= 604800000 (1 week).
+    required int64 toTimestamp = 5; // The exact time of finishing the search in milliseconds <= 2147483646000 (19-1-2038).
+}
+
+/** Response to the ProtoOADealListByPositionIdReq request. */
+message ProtoOADealListByPositionIdRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_DEAL_LIST_BY_POSITION_ID_RES];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    repeated ProtoOADeal deal = 3; // The list of deals.
+    required bool hasMore = 4; // If TRUE then the number of records by filter is larger than chunkSize, the response contains the number of records that is equal to chunkSize.
 }
