@@ -132,13 +132,15 @@ message ProtoOASymbol {
     optional ProtoOADayOfWeek rolloverCommission3Days = 28 [default = MONDAY]; // Day of the week (in UTC) when Administrative Fee charge amount will be tripled. Applied only if RolloverChargePeriod = 0 or 1
     optional ProtoOASwapCalculationType swapCalculationType = 29 [default = PIPS]; // Specifies type of SWAP computation as PIPS (0) or PERCENTAGE (1, annual, in percent)
     optional int64 lotSize = 30; // Lot size of the Symbol (in cents).
-    optional int64 preciseTradingCommissionRate = 31; // Commission base amount. Total commission depends on commissionType: for non-percentage types it is multiplied by 10^8.
+    optional int64 preciseTradingCommissionRate = 31; // Commission base amount. Total commission depends on commissionType: for non-percentage types it is multiplied by 10^8, for percentage of value commission type it is multiplied by 10^5
     optional int64 preciseMinCommission = 32; // Minimum commission amount per trade multiplied by 10^8.
     repeated ProtoOAHoliday holiday = 33; // List of holidays for this symbol specified by broker.
     optional int32 pnlConversionFeeRate = 34; // Percentage (1 = 0.01%) of the realized Gross Profit, which will be paid by the Trader for any trade if the Quote Asset of the traded Symbol is not matched with the Deposit Asset.
     optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/ctrader/trading/dynamic-leverage
     optional int32 swapPeriod = 36; // Period of charging swaps in hours. 24 means swaps will be charged 1 time per day, 12 - every 12 hours, 8 - every 8 hours, etc.
     optional int32 swapTime = 37; // Time in minutes from 00:00 (UTC) when intraday swaps are charged for the first time.
+    optional int32 skipSWAPPeriods = 38; // Count of swapPeriods before first SWAP charge.
+    optional bool chargeSwapAtWeekends = 39; // If enabled SWAP will be charged for all days of week, including Saturday and Sunday.
 }
 
 /** Lightweight symbol entity. */
@@ -187,7 +189,7 @@ message ProtoOAInterval {
 enum ProtoOACommissionType {
     USD_PER_MILLION_USD = 1; // USD per million USD volume - usually used for FX. Example: 50 USD for 1 mil USD of trading volume.
     USD_PER_LOT = 2; // USD per 1 lot - usually used for CFDs and futures for commodities, and indices. Example: 15 USD for 1 contract.
-    PERCENTAGE_OF_VALUE = 3; // Percentage of trading volume - usually used for Equities. Example: 0.005% of notional trading volume. Multiplied by 100,00.
+    PERCENTAGE_OF_VALUE = 3; // Percentage of trading volume - usually used for Equities. Example: 0.005% of notional trading volume. Multiplied by 100,000.
     QUOTE_CCY_PER_LOT = 4; // Quote ccy of Symbol per 1 lot - will be used for CFDs and futures for commodities, and indices. Example: 15 EUR for 1 contract of DAX.
 }
 
