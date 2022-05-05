@@ -1,5 +1,7 @@
 syntax = "proto2";
 
+option go_package = "/openapi";
+
 option java_multiple_files = true;
 option java_generate_equals_and_hash = true;
 option java_package = "com.xtrader.protocol.proto.commons";
@@ -26,4 +28,3 @@ message ProtoErrorRes {
 message ProtoHeartbeatEvent {
     optional ProtoPayloadType payloadType = 1 [default = HEARTBEAT_EVENT];
 }
-
