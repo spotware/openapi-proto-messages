@@ -30,4 +30,5 @@ jobs:
       - run: rm ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto/*.proto
       - run: mv *.proto ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - run: cd ${{env.HELP_PORTAL_REPO_NAME}}
-      - run: git config user.name github-actions; git config user.email github-actions@github.com; git add -A ; git commit -m "Update Open API Proto Message Files" ; git push;
+      - run: pwd
+      #- run: git config user.name github-actions; git config user.email github-actions@github.com; git add -A ; git commit -m "Update Open API Proto Message Files" ; git push;
