@@ -1,14 +1,9 @@
 name: Build Docs
 
-#on:
-#  release:
-#    types: [released]
-    
 on:
-  push:
-    branches:
-      - dev
-      
+  release:
+    types: [released]
+       
 env:
   HELP_PORTAL_REPO_NAME: ctrader-help
   
