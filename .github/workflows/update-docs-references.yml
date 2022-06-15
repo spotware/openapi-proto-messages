@@ -32,10 +32,13 @@ jobs:
       - run: ls
       - run: echo $HELP_PORTAL_REPO_NAME
       - run: mv *.proto ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
-      - run: cd ./$HELP_PORTAL_REPO_NAME
-      - run: ls
-      - run: pwd
-      - run: ls ./$HELP_PORTAL_REPO_NAME
+      - name: Commit and Push
+        working-directory: ./app
+        run: ls
+      #- run: cd ./$HELP_PORTAL_REPO_NAME
+      #- run: ls
+      #- run: pwd
+      #- run: ls ./$HELP_PORTAL_REPO_NAME
       #- run: git add -A
       #- run: git commit -m "Update Open API Proto Message Files"
       #- run: git push
