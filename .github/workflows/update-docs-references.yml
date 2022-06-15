@@ -34,9 +34,10 @@ jobs:
       - run: mv *.proto ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - name: Commit and Push
         working-directory: ctrader-help-duplicate
-        run: ls
+        run: cd ./open-api-docs/proto  ; ls ;
+        
       #- run: cd ./$HELP_PORTAL_REPO_NAME
-      #- run: ls
+      - run: ls
       #- run: pwd
       #- run: ls ./$HELP_PORTAL_REPO_NAME
       #- run: git add -A
