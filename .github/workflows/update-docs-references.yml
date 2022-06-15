@@ -32,9 +32,10 @@ jobs:
       - run: ls
       - run: echo $HELP_PORTAL_REPO_NAME
       - run: mv *.proto ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
+      - run: mv LICENSE ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - name: Commit and Push
         working-directory: ctrader-help-duplicate
-        run: cd ./open-api-docs/proto  ; ls ;
+        run: ls ./open-api-docs/proto
         
       #- run: cd ./$HELP_PORTAL_REPO_NAME
       - run: ls
