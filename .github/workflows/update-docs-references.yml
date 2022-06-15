@@ -29,18 +29,8 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: git clone git@github.com:spotware/$HELP_PORTAL_REPO_NAME.git
-      - run: ls
-      - run: echo $HELP_PORTAL_REPO_NAME
+      - run: rm ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto/*.proto
       - run: mv *.proto ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
-      - run: mv LICENSE ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
-      - name: Commit and Push
+      - name: Stage, Commit and Push
         working-directory: ctrader-help-duplicate
-        run: ls ./open-api-docs/proto
-        
-      #- run: cd ./$HELP_PORTAL_REPO_NAME
-      - run: ls
-      #- run: pwd
-      #- run: ls ./$HELP_PORTAL_REPO_NAME
-      #- run: git add -A
-      #- run: git commit -m "Update Open API Proto Message Files"
-      #- run: git push
+        run: git add -A ; git commit -m "Update Open API Proto Message Files" ; git push;
