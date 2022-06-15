@@ -23,7 +23,10 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null
           chmod 0600 ./HELP_PORTAL_KEY
           ssh-add ./HELP_PORTAL_KEY
-      - run: git clone git@github.com:spotware/$HELP_PORTAL_REPO_NAME.git
+      - name: Checkout
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: git clone git@github.com:spotware/$HELP_PORTAL_REPO_NAME.git
       - run: rm ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto/*.proto
       - run: mv *.proto ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - name: Stage, commit, and push
