@@ -1,11 +1,11 @@
 name: Build Docs
 
 on:
-  push:
-    branches:
-      - dev
+  release:
+    types: [released]
+       
 env:
-  HELP_PORTAL_REPO_NAME: ctrader-help-duplicate
+  HELP_PORTAL_REPO_NAME: ctrader-help
   
 jobs:
   deploy:
@@ -30,5 +30,7 @@ jobs:
       - run: rm ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto/*.proto
       - run: mv *.proto ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - name: Stage, commit, and push
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         working-directory: ${{env.HELP_PORTAL_REPO_NAME}}
         run: git config user.name github-actions; git config user.email github-actions@github.com; git add -A ; git commit -m "Update Open API Proto Message Files" ; git push;
