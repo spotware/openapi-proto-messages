@@ -1,3 +1,5 @@
 site/*
 /.vs/*
 /docs/.vs
+/HELP_PORTAL_KEY.pub
+/HELP_PORTAL_KEY
