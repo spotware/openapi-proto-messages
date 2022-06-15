@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - run: git config user.name github-actions
+      - run: git config user.email github-actions@github.com
       - run: echo '${{ secrets.HELP_PORTAL_SSH_KEY }}' > HELP_PORTAL_KEY
       - name: Setup SSH agent
         env:
@@ -30,8 +32,7 @@ jobs:
       - run: ls
       - run: mv *.proto $HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - run: cd $HELP_PORTAL_REPO_NAME
-      - run: git config user.name github-actions
-      - run: git config user.email github-actions@github.com
+      - run: ls
       - run: git add -A
       - run: git commit -m "Update Open API Proto Message Files"
-      - run: git push
+      #- run: git push
