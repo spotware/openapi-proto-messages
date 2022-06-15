@@ -11,7 +11,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - run: eval `ssh-agent -s`
+      - run: ssh-add - <<< '${{ secrets.HELP_PORTAL_SSH_KEY }}'
       - run: git config user.name github-actions
       - run: git config user.email github-actions@github.com
       - run: git clone https://github.com/spotware/$HELP_PORTAL_REPO_NAME.git
