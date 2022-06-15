@@ -33,7 +33,7 @@ jobs:
       - run: echo $HELP_PORTAL_REPO_NAME
       - run: mv *.proto ./$HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - name: Commit and Push
-        working-directory: ./app
+        working-directory: ./$HELP_PORTAL_REPO_NAME
         run: ls
       #- run: cd ./$HELP_PORTAL_REPO_NAME
       #- run: ls
