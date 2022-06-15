@@ -1,0 +1,23 @@
+name: Build Docs
+
+on:
+  push:
+    branches:
+      - main
+env:
+  HELP_PORTAL_REPO_NAME: ctrader-help-duplicate
+  
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: git config user.name github-actions
+      - run: git config user.email github-actions@github.com
+      - run: git clone https://github.com/spotware/$HELP_PORTAL_REPO_NAME.git
+      - run: ls
+      - run: mv "*.proto" $HELP_PORTAL_REPO_NAME/open-api-docs/proto
+      - run: cd $HELP_PORTAL_REPO_NAME
+      - run: git add -A
+      - run: git commit -m "Update Open API Proto Message Files"
+      - run: git push
