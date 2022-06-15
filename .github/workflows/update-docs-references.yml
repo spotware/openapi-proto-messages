@@ -30,6 +30,8 @@ jobs:
       - run: ls
       - run: mv *.proto $HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - run: cd $HELP_PORTAL_REPO_NAME
+      - run: git config user.name github-actions
+      - run: git config user.email github-actions@github.com
       - run: git add -A
       - run: git commit -m "Update Open API Proto Message Files"
       - run: git push
