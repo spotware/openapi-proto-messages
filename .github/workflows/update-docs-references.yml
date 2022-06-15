@@ -28,7 +28,7 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: git clone git@github.com:spotware/$HELP_PORTAL_REPO_NAME.git
       - run: ls
-      - run: mv "*.proto" $HELP_PORTAL_REPO_NAME/open-api-docs/proto
+      - run: mv *.proto $HELP_PORTAL_REPO_NAME/open-api-docs/proto
       - run: cd $HELP_PORTAL_REPO_NAME
       - run: git add -A
       - run: git commit -m "Update Open API Proto Message Files"
