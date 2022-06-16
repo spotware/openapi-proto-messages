@@ -16,3 +16,13 @@ $ ssh-keygen -t rsa -b 4096 -f ./KEY_FILE_NAME -C "your-email@spotware.com" -N "
 ```
 
 Then use public key as deploy key for Help Portal repository and private key for cloning or pushing changes to it.
+
+## Note
+
+Please don't use this repository for asking questions or suggesting new features, this repository sole purpose is to release Open API proto message files.
+
+If you any question or issue please use [cTrader.com](https://ctrader.com/forum/connect-api-support) forum Open API section.
+
+If you have any suggestion please use [cTrader.com](https://ctrader.com/forum/suggestions) suggestions section.
+
+You can also ask your questions on [Open API documentation](https://help.ctrader.com/open-api/) comments.
