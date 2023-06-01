@@ -1,7 +1,5 @@
 syntax = "proto2";
 
-option go_package = "/openapi";
-
 option java_multiple_files = true;
 
 option java_generate_equals_and_hash = true;
@@ -92,6 +90,12 @@ enum ProtoOAPayloadType {
     PROTO_OA_GET_DYNAMIC_LEVERAGE_RES = 2178;
     PROTO_OA_DEAL_LIST_BY_POSITION_ID_REQ = 2179;
     PROTO_OA_DEAL_LIST_BY_POSITION_ID_RES = 2180;
+    PROTO_OA_ORDER_DETAILS_REQ = 2181;
+    PROTO_OA_ORDER_DETAILS_RES = 2182;
+    PROTO_OA_ORDER_LIST_BY_POSITION_ID_REQ = 2183;
+    PROTO_OA_ORDER_LIST_BY_POSITION_ID_RES = 2184;
+    PROTO_OA_DEAL_OFFSET_LIST_REQ = 2185;
+    PROTO_OA_DEAL_OFFSET_LIST_RES = 2186;
 }
 
 /** Asset entity. */
@@ -131,18 +135,18 @@ message ProtoOASymbol {
     optional int32 skipRolloverDays = 25; // Initial period before the first rolloverCommission will be charged on the account.
     optional string scheduleTimeZone = 26; // Time zone for the symbol trading intervals.
     optional ProtoOATradingMode tradingMode = 27 [default = ENABLED]; // Rules for trading with the symbol. See ProtoOATradingMode for details.
-    optional ProtoOADayOfWeek rolloverCommission3Days = 28 [default = MONDAY]; // Day of the week (in UTC) when Administrative Fee charge amount will be tripled. Applied only if RolloverChargePeriod = 0 or 1
-    optional ProtoOASwapCalculationType swapCalculationType = 29 [default = PIPS]; // Specifies type of SWAP computation as PIPS (0) or PERCENTAGE (1, annual, in percent)
+    optional ProtoOADayOfWeek rolloverCommission3Days = 28 [default = MONDAY]; // Day of the week (in UTC) when Administrative Fee charge amount will be tripled. Applied only if RolloverChargePeriod = 0 or 1.
+    optional ProtoOASwapCalculationType swapCalculationType = 29 [default = PIPS]; // Specifies type of SWAP computation as PIPS (0) or PERCENTAGE (1, annual, in percent).
     optional int64 lotSize = 30; // Lot size of the Symbol (in cents).
-    optional int64 preciseTradingCommissionRate = 31; // Commission base amount. Total commission depends on commissionType: for non-percentage types it is multiplied by 10^8, for percentage of value commission type it is multiplied by 10^5
+    optional int64 preciseTradingCommissionRate = 31; // Commission base amount. Total commission depends on commissionType: for non-percentage types it is multiplied by 10^8, for percentage of value commission type it is multiplied by 10^5.
     optional int64 preciseMinCommission = 32; // Minimum commission amount per trade multiplied by 10^8.
     repeated ProtoOAHoliday holiday = 33; // List of holidays for this symbol specified by broker.
     optional int32 pnlConversionFeeRate = 34; // Percentage (1 = 0.01%) of the realized Gross Profit, which will be paid by the Trader for any trade if the Quote Asset of the traded Symbol is not matched with the Deposit Asset.
     optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/ctrader/trading/dynamic-leverage
     optional int32 swapPeriod = 36; // Period of charging swaps in hours. 24 means swaps will be charged 1 time per day, 12 - every 12 hours, 8 - every 8 hours, etc.
     optional int32 swapTime = 37; // Time in minutes from 00:00 (UTC) when intraday swaps are charged for the first time.
-    optional int32 skipSWAPPeriods = 38; // Count of swapPeriods before first SWAP charge.
-    optional bool chargeSwapAtWeekends = 39; // If enabled SWAP will be charged for all days of week, including Saturday and Sunday.
+    optional int32 skipSWAPPeriods = 38; // Count of swapPeriods before the first SWAP charge.
+    optional bool chargeSwapAtWeekends = 39; // If enabled, SWAP will be charged for all days of the week, including Saturday and Sunday.
 }
 
 /** Lightweight symbol entity. */
@@ -265,6 +269,7 @@ message ProtoOATrader {
     optional bool isLimitedRisk = 18; // If TRUE then account is compliant to use specific margin calculation strategy.
     optional ProtoOALimitedRiskMarginCalculationStrategy limitedRiskMarginCalculationStrategy = 19 [default = ACCORDING_TO_LEVERAGE]; // Special strategy used in margin calculations for this account (if account isLimitedRisk).
     optional uint32 moneyDigits = 20; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects balance, managerBonus, ibBonus, nonWithdrawableBonus.
+    optional bool fairStopOut = 21; // If TRUE - Position is fully closed on Stop Out, if FALSE - smart (partial closing) Stop Out is applied, if unspecified  - Stop Out format is determined by Broker.
 }
 
 /** Position status ENUM. */
@@ -482,6 +487,14 @@ message ProtoOADeal {
     optional double baseToUsdConversionRate = 15; // Base to USD conversion rate on the time of deal execution.
     optional ProtoOAClosePositionDetail closePositionDetail = 16; // Closing position detail. Valid only for closing deal.
     optional uint32 moneyDigits = 17; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects commission.
+}
+
+/** Deal details for ProtoOADealOffsetListReq. */
+message ProtoOADealOffset {
+    required int64 dealId = 1; // The unique ID of the execution Deal.
+    required int64 volume = 2; // Matched volume, in cents.
+    optional int64 executionTimestamp = 3; // Time when the offset Deal was executed.
+    optional double executionPrice = 4; //  Execution price of the offset Deal.
 }
 
 /** Deal status ENUM. */
