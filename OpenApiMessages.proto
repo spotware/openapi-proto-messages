@@ -1,7 +1,5 @@
 syntax = "proto2";
 
-option go_package = "/openapi";
-
 option java_multiple_files = true;
 
 option java_generate_equals_and_hash = true;
@@ -16,8 +14,8 @@ import "OpenApiModelMessages.proto";
 message ProtoOAApplicationAuthReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_APPLICATION_AUTH_REQ];
 
-    required string clientId = 2; //The unique Client ID provided during the registration.
-    required string clientSecret = 3; //The unique Client Secret provided during the registration.
+    required string clientId = 2; // The unique Client ID provided during the registration.
+    required string clientSecret = 3; // The unique Client Secret provided during the registration.
 }
 
 /** Response to the ProtoOAApplicationAuthReq request. */
@@ -44,7 +42,7 @@ message ProtoOAAccountAuthRes {
 message ProtoOAErrorRes {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ERROR_RES];
 
-    optional int64 ctidTraderAccountId = 2; //The unique identifier of the trader's account in cTrader platform.
+    optional int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
     required string errorCode = 3; // The name of the ProtoErrorCode or the other custom ErrorCodes (e.g. ProtoCHErrorCode).
     optional string description = 4; // The error description.
     optional int64 maintenanceEndTimestamp = 5; // The timestamp in seconds when the current maintenance session will be ended.
@@ -230,7 +228,7 @@ message ProtoOASymbolByIdRes {
     repeated ProtoOAArchivedSymbol archivedSymbol = 4; // Archived symbols.
 }
 
-/** Request for getting a conversion chain between two assets that consists of several symbols. Use when no direct quote is available */
+/** Request for getting a conversion chain between two assets that consists of several symbols. Use when no direct quote is available. */
 message ProtoOASymbolsForConversionReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_SYMBOLS_FOR_CONVERSION_REQ];
 
@@ -727,4 +725,55 @@ message ProtoOADealListByPositionIdRes {
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated ProtoOADeal deal = 3; // The list of deals.
     required bool hasMore = 4; // If TRUE then the number of records by filter is larger than chunkSize, the response contains the number of records that is equal to chunkSize.
+}
+
+/** Request for getting Order and its related Deals. */
+message ProtoOAOrderDetailsReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ORDER_DETAILS_REQ];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    required int64 orderId = 3; // The unique ID of the Order.
+}
+
+/** Response to the ProtoOAOrderDetailsReq request. */
+message ProtoOAOrderDetailsRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ORDER_DETAILS_RES];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    required ProtoOAOrder order = 3; // Order details.
+    repeated ProtoOADeal deal = 4; // All Deals created by filling the specified Order.
+}
+
+/** Request for retrieving Orders related to a Position by using Position ID. Filtered by utcLastUpdateTimestamp. */
+message ProtoOAOrderListByPositionIdReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ORDER_LIST_BY_POSITION_ID_REQ];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    required int64 positionId = 3; // The unique ID of the Position.
+    required int64 fromTimestamp = 4; // The UNIX time from which the search starts >=0 (1-1-1970). Validation: toTimestamp - fromTimestamp <= 604800000 (1 week). Search by utcLastUpdateTimestamp of the Order.
+    required int64 toTimestamp = 5; // The UNIX time where to stop searching <= 2147483646000 (19-1-2038).  Search by utcLastUpdateTimestamp of the Order.
+}
+
+/** Response to ProtoOAOrderListByPositionIdReq request. */
+message ProtoOAOrderListByPositionIdRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ORDER_LIST_BY_POSITION_ID_RES];
+
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    repeated ProtoOAOrder order = 3; // Orders related to the specified Position, sorted by utcLastUpdateTimestamp in descending order (newest first).
+    required bool hasMore = 4; // If TRUE then the number of records by filter is larger than chunkSize, the response contains the number of records that is equal to chunkSize.
+}
+
+/** Request for getting sets of Deals that were offset by a specific Deal and that are offsetting the Deal. */
+message ProtoOADealOffsetListReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_DEAL_OFFSET_LIST_REQ];
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    required int64 dealId = 3; // The unique ID of the Deal.
+}
+
+/** Response for ProtoOADealOffsetListReq. */
+message ProtoOADealOffsetListRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_DEAL_OFFSET_LIST_RES];
+    required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    repeated ProtoOADealOffset offsetBy = 3; // Deals which closed the specified deal.
+    repeated ProtoOADealOffset offsetting = 4; // Deals which were closed by the specified deal.
 }
