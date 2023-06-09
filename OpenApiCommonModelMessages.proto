@@ -31,3 +31,4 @@ enum ProtoErrorCode {
     CONCURRENT_MODIFICATION = 10; // Order is blocked (e.g. under execution) and change cannot be applied.
     BLOCKED_PAYLOAD_TYPE = 11; // Message is blocked by server.
 }
+

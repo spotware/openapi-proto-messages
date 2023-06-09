@@ -28,3 +28,4 @@ message ProtoErrorRes {
 message ProtoHeartbeatEvent {
     optional ProtoPayloadType payloadType = 1 [default = HEARTBEAT_EVENT];
 }
+
