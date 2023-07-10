@@ -138,8 +138,8 @@ message ProtoOAAmendOrderReq {
     optional double limitPrice = 5; // The Limit Price, can be specified for the LIMIT order only.
     optional double stopPrice = 6; // The Stop Price, can be specified for the STOP and the STOP_LIMIT orders.
     optional int64 expirationTimestamp = 7; // The exact Order expiration time. Should be set for the Good Till Date orders.
-    optional double stopLoss = 8; // The absolute Stop Loss price (e.g. 1.23456). Not supported for the MARKER orders.
-    optional double takeProfit = 9; // The absolute Take Profit price (e.g. 1.23456). Not supported for the MARKER orders.
+    optional double stopLoss = 8; // The absolute Stop Loss price (e.g. 1.23456). Not supported for the MARKET orders.
+    optional double takeProfit = 9; // The absolute Take Profit price (e.g. 1.23456). Not supported for the MARKET orders.
     optional int32 slippageInPoints = 10; // Slippage distance for the MARKET_RANGE and the STOP_LIMIT orders.
     optional int64 relativeStopLoss = 11; // The relative Stop Loss can be specified instead of the absolute one. Specified in 1/100000 of a unit of price. For BUY stopLoss = entryPrice - relativeStopLoss, for SELL stopLoss = entryPrice + relativeStopLoss.
     optional int64 relativeTakeProfit = 12; // The relative Take Profit can be specified instead of the absolute one. Specified in 1/100000 of a unit of price. For BUY takeProfit = entryPrice + relativeTakeProfit, for SELL takeProfit = entryPrice - relativeTakeProfit.
