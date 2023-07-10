@@ -146,7 +146,7 @@ message ProtoOASymbol {
     optional int64 preciseMinCommission = 32; // Minimum commission amount per trade multiplied by 10^8.
     repeated ProtoOAHoliday holiday = 33; // List of holidays for this symbol specified by broker.
     optional int32 pnlConversionFeeRate = 34; // Percentage (1 = 0.01%) of the realized Gross Profit, which will be paid by the Trader for any trade if the Quote Asset of the traded Symbol is not matched with the Deposit Asset.
-    optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/ctrader/trading/dynamic-leverage
+    optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/trading-with-ctrader/dynamic-leverage/
     optional int32 swapPeriod = 36; // Period of charging swaps in hours. 24 means swaps will be charged 1 time per day, 12 - every 12 hours, 8 - every 8 hours, etc.
     optional int32 swapTime = 37; // Time in minutes from 00:00 (UTC) when intraday swaps are charged for the first time.
     optional int32 skipSWAPPeriods = 38; // Count of swapPeriods before the first SWAP charge.
