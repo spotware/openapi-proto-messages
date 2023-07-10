@@ -98,6 +98,8 @@ enum ProtoOAPayloadType {
     PROTO_OA_ORDER_LIST_BY_POSITION_ID_RES = 2184;
     PROTO_OA_DEAL_OFFSET_LIST_REQ = 2185;
     PROTO_OA_DEAL_OFFSET_LIST_RES = 2186;
+    PROTO_OA_GET_POSITION_UNREALIZED_PNL_REQ = 2187;
+    PROTO_OA_GET_POSITION_UNREALIZED_PNL_RES = 2188;
 }
 
 /** Asset entity. */
@@ -133,7 +135,7 @@ message ProtoOASymbol {
     optional int64 minCommission = 21 [deprecated = true]; // Minimum commission amount per trade. Use preciseMinCommission.
     optional ProtoOAMinCommissionType minCommissionType = 22 [default = CURRENCY]; // Minimum commission Type. See ProtoOAMinCommissionType for details.
     optional string minCommissionAsset = 23 [default = "USD"]; // Currency for minimum commission. (USD or quote currency).
-    optional int64 rolloverCommission = 24; // Amount of commission per trade for Shariah Compliant accounts in deposit currency (swapFree = TRUE).
+    optional int64 rolloverCommission = 24; // Administrative Fee, charged instead of Swaps if the Account is marked as a "Shariah Compliant (Swap Free)". The Administrative Fee is charged daily as USD per current open volume of Position in lots. The Account charged in the Deposit currency.
     optional int32 skipRolloverDays = 25; // Initial period before the first rolloverCommission will be charged on the account.
     optional string scheduleTimeZone = 26; // Time zone for the symbol trading intervals.
     optional ProtoOATradingMode tradingMode = 27 [default = ENABLED]; // Rules for trading with the symbol. See ProtoOATradingMode for details.
@@ -144,11 +146,12 @@ message ProtoOASymbol {
     optional int64 preciseMinCommission = 32; // Minimum commission amount per trade multiplied by 10^8.
     repeated ProtoOAHoliday holiday = 33; // List of holidays for this symbol specified by broker.
     optional int32 pnlConversionFeeRate = 34; // Percentage (1 = 0.01%) of the realized Gross Profit, which will be paid by the Trader for any trade if the Quote Asset of the traded Symbol is not matched with the Deposit Asset.
-    optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/trading-with-ctrader/dynamic-leverage/
+    optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/ctrader/trading/dynamic-leverage
     optional int32 swapPeriod = 36; // Period of charging swaps in hours. 24 means swaps will be charged 1 time per day, 12 - every 12 hours, 8 - every 8 hours, etc.
     optional int32 swapTime = 37; // Time in minutes from 00:00 (UTC) when intraday swaps are charged for the first time.
     optional int32 skipSWAPPeriods = 38; // Count of swapPeriods before the first SWAP charge.
     optional bool chargeSwapAtWeekends = 39; // If enabled, SWAP will be charged for all days of the week, including Saturday and Sunday.
+    optional string measurementUnits = 40;  // Specifies the units in which the base Asset of the Symbol is denominated.
 }
 
 /** Lightweight symbol entity. */
@@ -160,6 +163,7 @@ message ProtoOALightSymbol {
     optional int64 quoteAssetId = 5; // Quote asset.
     optional int64 symbolCategoryId = 6; // Id of the symbol category used for symbols grouping.
     optional string description = 7;
+    optional double sortingNumber = 8; // The number used for sorting Symbols in the UI (lowest number should appear at the top).
 }
 
 message ProtoOAArchivedSymbol {
@@ -174,6 +178,7 @@ message ProtoOASymbolCategory {
     required int64 id = 1; // The unique identifier of the symbol category.
     required int64 assetClassId = 2; // Link to the asset class. One asset class can have many symbol categories.
     required string name = 3; // Category name.
+    optional double sortingNumber = 4; // The number used for sorting Symbol Categories in the UI (lowest number should appear at the top).
 }
 
 enum ProtoOADayOfWeek {
@@ -353,6 +358,8 @@ message ProtoOATradeData {
     optional string label = 5; // Text label specified during order request.
     optional bool guaranteedStopLoss = 6; // If TRUE then position/order stop loss is guaranteedStopLoss.
     optional string comment = 7; // User-specified comment.
+    optional string measurementUnits = 8; // Specifies the units in which the Symbol is denominated.
+    optional uint64 closeTimestamp = 9; // The UNIX timestamp in milliseconds when a Position was closed
 }
 
 /** Trade order entity. */
@@ -595,6 +602,7 @@ message ProtoOACtidTraderAccount {
 message ProtoOAAssetClass {
     optional int64 id = 1; // Unique asset ID.
     optional string name = 2; // Asset class name.
+    optional double sortingNumber = 3; // The number used for sorting Asset Classes in the UI (lowest number should appear at the top).
 }
 
 /** Depth of market entity. */
@@ -696,4 +704,10 @@ message ProtoOADynamicLeverage {
 message ProtoOADynamicLeverageTier {
     required int64 volume = 1; // Max USD volume (in cents) of the Open Position (per side) to apply specified leverage. Last tier's leverage is applied also to volume above specified.
     required int32 leverage = 2; // Applied leverage.
+}
+
+message ProtoOAPositionUnrealizedPnL {
+    required int64 positionId = 1; // The position ID.
+    required int64 grossUnrealizedPnL = 2; // The gross unrealized PnL of the position denoted in the account deposit currency.
+    required int64 netUnrealizedPnL = 3; // The net unrealized PnL of the position denoted in the account deposit currency. It does not include potential closing commission.
 }

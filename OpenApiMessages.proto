@@ -298,6 +298,7 @@ message ProtoOAReconcileReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_RECONCILE_REQ];
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
+    optional bool returnProtectionOrders = 3; // If TRUE, then current protection orders are returned separately, otherwise you can use position.stopLoss and position.takeProfit fields.
 }
 
 /** The response to the ProtoOAReconcileReq request. */
@@ -336,10 +337,10 @@ message ProtoOADealListRes {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated ProtoOADeal deal = 3; // The list of the deals.
-    required bool hasMore = 4; // If TRUE then the response will provide more than 10000 deals.
+    required bool hasMore = 4; // If TRUE then the number of records by filter is larger than chunkSize, the response contains the number of records that is equal to chunkSize.
 }
 
-/** Request for getting Trader's closed orders filtered by timestamp */
+/** Request for getting Trader's orders filtered by timestamp */
 message ProtoOAOrderListReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ORDER_LIST_REQ];
 
@@ -354,7 +355,7 @@ message ProtoOAOrderListRes {
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated ProtoOAOrder order = 3; // The list of the orders.
-    required bool hasMore = 4; // If TRUE then the response will provide more than 10000 orders.
+    required bool hasMore = 4; // If TRUE then the number of records by filter is larger than chunkSize, the response contains the number of records that is equal to chunkSize.
 }
 
 /** Request for getting the margin estimate. Can be used before sending a new order request. */
@@ -519,7 +520,7 @@ message ProtoOAGetTrendbarsReq {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_GET_TRENDBARS_REQ];
 
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
-    required int64 fromTimestamp = 3; // The exact time of starting the search in milliseconds. Must be bigger or equal to zero (1-1-1970). Validation: toTimestamp - fromTimestamp <= X, where X depends on series period: M1, M2, M3, M4, M5: 302400000 (5 weeks); M10, M15, M30, H1: 21168000000 (35 weeks), H4, H12, D1: 31622400000 (1 year); W1, MN1: 158112000000 (5 years).
+    required int64 fromTimestamp = 3; // The exact time of starting the search in milliseconds. Must be bigger or equal to zero (1-1-1970). Validation: toTimestamp - fromTimestamp <= X, where X depends on series period: M1, M2, M3, M4, M5: 3024000000 (5 weeks); M10, M15, M30, H1: 21168000000 (35 weeks), H4, H12, D1: 31622400000 (1 year); W1, MN1: 158112000000 (5 years).
     required int64 toTimestamp = 4; // The exact time of finishing the search in milliseconds. Smaller or equal to 2147483646000 (19-1-2038).
     required ProtoOATrendbarPeriod period = 5; // Specifies period of trend bar series (e.g. M1, M10, etc.).
     required int64 symbolId = 6; // Unique identifier of the Symbol in cTrader platform.
@@ -778,4 +779,16 @@ message ProtoOADealOffsetListRes {
     required int64 ctidTraderAccountId = 2; // Unique identifier of the trader's account. Used to match responses to trader's accounts.
     repeated ProtoOADealOffset offsetBy = 3; // Deals which closed the specified deal.
     repeated ProtoOADealOffset offsetting = 4; // Deals which were closed by the specified deal.
+}
+
+message ProtoOAGetPositionUnrealizedPnLReq {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_GET_POSITION_UNREALIZED_PNL_REQ];
+    required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
+}
+
+message ProtoOAGetPositionUnrealizedPnLRes {
+    optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_GET_POSITION_UNREALIZED_PNL_RES];
+    required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
+    repeated ProtoOAPositionUnrealizedPnL positionUnrealizedPnL = 3; // Information about trader's positions' unrealized PnLs.
+    required uint32 moneyDigits = 4; // Specifies the exponent of various monetary values. E.g., moneyDigits = 8 should be interpreted as the value multiplied by 10^8 with the 'real' value equal to 10053099944 / 10^8 = 100.53099944. Affects positionUnrealizedPnL.grossUnrealizedPnL, positionUnrealizedPnL.netUnrealizedPnL.
 }
