@@ -90,19 +90,19 @@ message ProtoOANewOrderReq {
     optional double stopPrice = 8; // Stop Price, can be specified for the STOP and the STOP_LIMIT orders only.
     optional ProtoOATimeInForce timeInForce = 9 [default = GOOD_TILL_CANCEL]; // The specific order execution or expiration instruction - GOOD_TILL_DATE, GOOD_TILL_CANCEL, IMMEDIATE_OR_CANCEL, FILL_OR_KILL, MARKET_ON_OPEN.
     optional int64 expirationTimestamp = 10; // The exact Order expiration time. Should be set for the Good Till Date orders.
-    optional double stopLoss = 11; // The absolute Stop Loss price (1.23456 for example). Not supported for the MARKER orders.
-    optional double takeProfit = 12; // The absolute Take Profit price (1.23456 for example). Unsupported for the MARKER orders.
+    optional double stopLoss = 11; // The absolute Stop Loss price (1.23456 for example). Not supported for MARKET orders; for these orders, please use relativeStopLoss.
+    optional double takeProfit = 12; // The absolute Take Profit price (1.23456 for example). Not supported for MARKET orders; for these orders, please use relativeTakeProfit.
     optional string comment = 13; // User-specified comment. MaxLength = 512.
     optional double baseSlippagePrice = 14; // Base price to calculate relative slippage price for MARKET_RANGE order.
     optional int32 slippageInPoints = 15; // Slippage distance for MARKET_RANGE and STOP_LIMIT order.
     optional string label = 16; // User-specified label. MaxLength = 100.
     optional int64 positionId = 17; // Reference to the existing position if the Order is intended to modify it.
     optional string clientOrderId = 18; // Optional user-specific clientOrderId (similar to FIX ClOrderID). MaxLength = 50.
-    optional int64 relativeStopLoss = 19; // Relative Stop Loss that can be specified instead of the absolute as one. Specified in 1/100000 of unit of a price. For BUY stopLoss = entryPrice - relativeStopLoss, for SELL stopLoss = entryPrice + relativeStopLoss.
-    optional int64 relativeTakeProfit = 20; // Relative Take Profit that can be specified instead of the absolute one. Specified in 1/100000 of unit of a price. For BUY takeProfit = entryPrice + relativeTakeProfit, for SELL takeProfit = entryPrice - relativeTakeProfit.
+    optional int64 relativeStopLoss = 19; // Used in MARKET orders only. Relative Stop Loss that can be specified instead of the absolute as one. Specified in 1/100000 of unit of a price. For BUY stopLoss = entryPrice - relativeStopLoss, for SELL stopLoss = entryPrice + relativeStopLoss.
+    optional int64 relativeTakeProfit = 20; // Used in MARKET orders only. Relative Take Profit that can be specified instead of the absolute one. Specified in 1/100000 of unit of a price. For BUY takeProfit = entryPrice + relativeTakeProfit, for SELL takeProfit = entryPrice - relativeTakeProfit.
     optional bool guaranteedStopLoss = 21; // If TRUE then stopLoss is guaranteed. Available for the French Risk or the Guaranteed Stop Loss Accounts.
     optional bool trailingStopLoss = 22; // If TRUE then the Stop Loss is Trailing.
-    optional ProtoOAOrderTriggerMethod stopTriggerMethod = 23 [default = TRADE]; // Trigger method for the STOP or the STOP_LIMIT pending order.
+    optional ProtoOAOrderTriggerMethod stopTriggerMethod = 23 [default = TRADE]; // Trigger method for the STOP or the STOP_LIMIT pending order. The default value is ProtoOAOrderTriggerMethod.TRADE.
 }
 
 /** Event that is sent following the successful order acceptance or execution by the server. Acts as response to the ProtoOANewOrderReq, ProtoOACancelOrderReq, ProtoOAAmendOrderReq, ProtoOAAmendPositionSLTPReq, ProtoOAClosePositionReq requests. Also, the event is sent when a Deposit/Withdrawal took place. */
