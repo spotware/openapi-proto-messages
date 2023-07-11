@@ -1,28 +1,14 @@
 # Open API Proto Messages
 
-You can download the latest version of Open API proto message files from this repository releases.
+You can download the latest version of the Open API proto message files from this repository. It is maintained by Spotware and is updated every time new messages are added or existing messages are modified.
 
-You can find each relese changelog and also for references you can check Open API [documentation](https://spotware.github.io/open-api-docs/).
+To learn more, you can consult the [**changelogs of the recent releases**](https://github.com/spotware/openapi-proto-messages/releases). You can also check [the official cTrader Open API documentation](https://help.ctrader.com/open-api/). 
 
-
-## Update Docs References Action
-
-This action will run on each release, it clones the help portal repository, then it updates the proto message files of Open API and then it commits and pushes.
-
-For creating SSH key use:
-
-```
-$ ssh-keygen -t rsa -b 4096 -f ./KEY_FILE_NAME -C "your-email@spotware.com" -N ""
-```
-
-Then use public key as deploy key for Help Portal repository and private key for cloning or pushing changes to it.
 
 ## Note
 
-Please don't use this repository for asking questions or suggesting new features, this repository sole purpose is to release Open API proto message files.
+Please do not use this repository for asking questions or suggesting new features. The sole purpose of this repository is to release Open API proto message files.
 
-If you any question or issue please use [cTrader.com](https://ctrader.com/forum/connect-api-support) forum Open API section.
+If you have any questions or issues please ask or report them in the Open API section of the [cTrader.com](https://ctrader.com/forum/connect-api-support) forum.
 
-If you have any suggestion please use [cTrader.com](https://ctrader.com/forum/suggestions) suggestions section.
-
-You can also ask your questions on [Open API documentation](https://help.ctrader.com/open-api/) comments.
+To propose new suggestions for improving the Open API, please use the 'Suggestions' section of the [cTrader.com](https://ctrader.com/forum/suggestions) forum.
