@@ -518,7 +518,7 @@ enum ProtoOADealStatus {
 
 /** Trading details for closing deal. */
 message ProtoOAClosePositionDetail {
-    required double entryPrice = 1; // Position price at the moment of filling the closing order.
+    required double entryPrice = 1; // The entry price of the position for which the closing deal was generated.
     required int64 grossProfit = 2; // Amount of realized gross profit after closing deal execution.
     required int64 swap = 3; // Amount of realized swap related to closed volume.
     required int64 commission = 4; // Amount of realized commission related to closed volume.
