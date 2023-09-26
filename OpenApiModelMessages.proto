@@ -146,7 +146,7 @@ message ProtoOASymbol {
     optional int64 preciseMinCommission = 32; // Minimum commission amount per trade multiplied by 10^8.
     repeated ProtoOAHoliday holiday = 33; // List of holidays for this symbol specified by broker.
     optional int32 pnlConversionFeeRate = 34; // Percentage (1 = 0.01%) of the realized Gross Profit, which will be paid by the Trader for any trade if the Quote Asset of the traded Symbol is not matched with the Deposit Asset.
-    optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/trading-with-ctrader/dynamic-leverage/
+    optional int64 leverageId = 35; // The unique identifier of dynamic leverage entity. https://help.ctrader.com/ctrader/trading/dynamic-leverage
     optional int32 swapPeriod = 36; // Period of charging swaps in hours. 24 means swaps will be charged 1 time per day, 12 - every 12 hours, 8 - every 8 hours, etc.
     optional int32 swapTime = 37; // Time in minutes from 00:00 (UTC) when intraday swaps are charged for the first time.
     optional int32 skipSWAPPeriods = 38; // Count of swapPeriods before the first SWAP charge.
@@ -167,10 +167,10 @@ message ProtoOALightSymbol {
 }
 
 message ProtoOAArchivedSymbol {
-    required int64 symbolId = 1;
-    required string name = 2;
-    required int64 utcLastUpdateTimestamp = 3;
-    optional string description = 4;
+    required int64 symbolId = 1; // The unique identifier of the symbol in specific server environment within cTrader platform. Different brokers might have different IDs.
+    required string name = 2; // Name of the symbol (e.g. EUR/USD).
+    required int64 utcLastUpdateTimestamp = 3; // The Unix time in milliseconds of the last update of the symbol.
+    optional string description = 4; // Description of the symbol.
 }
 
 /** Symbol category entity. */
@@ -272,7 +272,7 @@ message ProtoOATrader {
     optional int64 traderLogin = 14; // ID of the account that is unique per server (Broker).
     optional ProtoOAAccountType accountType = 15 [default = HEDGED]; // Account type: HEDGED, NETTED, etc.
     optional string brokerName = 16; // Some whitelabel assigned to trader by broker at the moment of account creation.
-    optional int64 registrationTimestamp = 17; // Unix timestamp of the account registration. Should be used as minimal date in historical data requests.
+    optional int64 registrationTimestamp = 17; // The Unix timestamp in milliseconds of the account registration. Should be used as minimal date in historical data requests.
     optional bool isLimitedRisk = 18; // If TRUE then account is compliant to use specific margin calculation strategy.
     optional ProtoOALimitedRiskMarginCalculationStrategy limitedRiskMarginCalculationStrategy = 19 [default = ACCORDING_TO_LEVERAGE]; // Special strategy used in margin calculations for this account (if account isLimitedRisk).
     optional uint32 moneyDigits = 20; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects balance, managerBonus, ibBonus, nonWithdrawableBonus.
@@ -338,7 +338,7 @@ message ProtoOAPosition {
     optional double price = 5; // VWAP price of the position based on all executions (orders) linked to the position.
     optional double stopLoss = 6; // Current stop loss price.
     optional double takeProfit = 7; // Current take profit price.
-    optional int64 utcLastUpdateTimestamp = 8; // Time of the last change of the position, including amend SL/TP of the position, execution of related order, cancel or related order, etc.
+    optional int64 utcLastUpdateTimestamp = 8; // The Unix time in milliseconds of the last change of the position, including amend SL/TP of the position, execution of related order, cancel or related order, etc.
     optional int64 commission = 9; // Current unrealized commission related to the position.
     optional double marginRate = 10; // Rate for used margin computation. Represented as Base/Deposit.
     optional int64 mirroringCommission = 11; // Amount of unrealized commission related to following of strategy provider.
@@ -354,12 +354,12 @@ message ProtoOATradeData {
     required int64 symbolId = 1; // The unique identifier of the symbol in specific server environment within cTrader platform. Different brokers might have different IDs.
     required int64 volume = 2; // Volume in cents.
     required ProtoOATradeSide tradeSide = 3; // Buy, Sell.
-    optional int64 openTimestamp = 4; // Time when position was opened or order was created.
+    optional int64 openTimestamp = 4; // The Unix time in milliseconds when position was opened or order was created.
     optional string label = 5; // Text label specified during order request.
     optional bool guaranteedStopLoss = 6; // If TRUE then position/order stop loss is guaranteedStopLoss.
     optional string comment = 7; // User-specified comment.
     optional string measurementUnits = 8; // Specifies the units in which the Symbol is denominated.
-    optional uint64 closeTimestamp = 9; // The UNIX timestamp in milliseconds when a Position was closed
+    optional uint64 closeTimestamp = 9; // The Unix time in milliseconds when a Position was closed
 }
 
 /** Trade order entity. */
@@ -368,10 +368,10 @@ message ProtoOAOrder {
     required ProtoOATradeData tradeData = 2; // Detailed trader data.
     required ProtoOAOrderType orderType = 3; // Order type.
     required ProtoOAOrderStatus orderStatus = 4; // Order status.
-    optional int64 expirationTimestamp = 6; // If the order has time in force GTD then expiration is specified.
+    optional int64 expirationTimestamp = 6; // The Unix time in milliseconds of expiration if the order has time in force GTD.
     optional double executionPrice = 7; // Price at which an order was executed. For order with FILLED status.
     optional int64 executedVolume = 8; // Part of the volume that was filled.
-    optional int64 utcLastUpdateTimestamp = 9; // Timestamp of the last update of the order.
+    optional int64 utcLastUpdateTimestamp = 9; // The Unix time in milliseconds of the last update of the order.
     optional double baseSlippagePrice = 10; // Used for Market Range order with combination of slippageInPoints to specify price range were order can be executed.
     optional int64 slippageInPoints = 11; // Used for Market Range and STOP_LIMIT orders to to specify price range were order can be executed.
     optional bool closingOrder = 12; // If TRUE then the order is closing part of whole position. Must have specified positionId.
@@ -412,7 +412,7 @@ message ProtoOABonusDepositWithdraw {
     required int64 managerDelta = 4; // Amount of bonus deposited/withdrew by manager.
     required int64 ibBonus = 5; // Total amount of introducing broker's bonus after the operation.
     required int64 ibDelta = 6; // Amount of bonus deposited/withdrew by introducing broker.
-    required int64 changeBonusTimestamp = 7; // Time when the bonus operation was executed.
+    required int64 changeBonusTimestamp = 7; // The Unix time in milliseconds when the bonus operation was executed.
     optional string externalNote = 8; // Note added to operation. Visible to the trader.
     optional int64 introducingBrokerId = 9; // ID of introducing broker who deposited/withdrew bonus.
     optional uint32 moneyDigits = 10; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects managerBonus, managerDelta, ibBonus, ibDelta.
@@ -430,7 +430,7 @@ message ProtoOADepositWithdraw {
     required int64 balanceHistoryId = 2; // The unique ID of the deposit/withdrawal operation.
     required int64 balance = 3; // Account balance after the operation was executed.
     required int64 delta = 4; // Amount of deposit/withdrawal operation.
-    required int64 changeBalanceTimestamp = 5; // Time when deposit/withdrawal operation was executed.
+    required int64 changeBalanceTimestamp = 5; // The Unix time in milliseconds when deposit/withdrawal operation was executed.
     optional string externalNote = 6; // Note added to operation. Visible to the trader.
     optional int64 balanceVersion = 7; // Balance version used to identify the final balance. Increments each time when the trader's account balance is changed.
     optional int64 equity = 8; // Total account's equity after balance operation was executed.
@@ -485,9 +485,9 @@ message ProtoOADeal {
     required int64 volume = 4; // Volume sent for execution, in cents.
     required int64 filledVolume = 5; // Filled volume, in cents.
     required int64 symbolId = 6; // The unique identifier of the symbol in specific server environment within cTrader platform. Different servers have different IDs.
-    required int64 createTimestamp = 7; // Time when the deal was sent for execution.
-    required int64 executionTimestamp = 8; // Time when the deal was executed.
-    optional int64 utcLastUpdateTimestamp = 9; // Timestamp when the deal was created, executed or rejected.
+    required int64 createTimestamp = 7; // The Unix time in milliseconds when the deal was sent for execution.
+    required int64 executionTimestamp = 8; // The Unix time in milliseconds when the deal was executed.
+    optional int64 utcLastUpdateTimestamp = 9; // The Unix time in milliseconds when the deal was created, executed or rejected.
     optional double executionPrice = 10; // Execution price.
     required ProtoOATradeSide tradeSide = 11; // Buy/Sell.
     required ProtoOADealStatus dealStatus = 12; // Status of the deal.
@@ -502,7 +502,7 @@ message ProtoOADeal {
 message ProtoOADealOffset {
     required int64 dealId = 1; // The unique ID of the execution Deal.
     required int64 volume = 2; // Matched volume, in cents.
-    optional int64 executionTimestamp = 3; // Time when the offset Deal was executed.
+    optional int64 executionTimestamp = 3; // The Unix time in milliseconds when the offset Deal was executed.
     optional double executionPrice = 4; //  Execution price of the offset Deal.
 }
 
@@ -518,7 +518,7 @@ enum ProtoOADealStatus {
 
 /** Trading details for closing deal. */
 message ProtoOAClosePositionDetail {
-    required double entryPrice = 1; // The entry price of the position for which the closing deal was generated.
+    required double entryPrice = 1; // Position price at the moment of filling the closing order.
     required int64 grossProfit = 2; // Amount of realized gross profit after closing deal execution.
     required int64 swap = 3; // Amount of realized swap related to closed volume.
     required int64 commission = 4; // Amount of realized commission related to closed volume.
@@ -556,7 +556,7 @@ message ProtoOATrendbar {
     optional uint64 deltaOpen = 6; // Delta between open and low price. open = low + deltaOpen.
     optional uint64 deltaClose = 7; // Delta between close and low price. close = low + deltaClose.
     optional uint64 deltaHigh = 8; // Delta between high and low price. high = low + deltaHigh.
-    optional uint32 utcTimestampInMinutes = 9; // Timestamp of the bar. Equal to the timestamp of the open tick.
+    optional uint32 utcTimestampInMinutes = 9; // The Unix time in minutes of the bar, equal to the timestamp of the open tick.
 }
 
 /** Expected margin computation entity. */
@@ -574,7 +574,7 @@ enum ProtoOAQuoteType {
 
 /** Historical tick data type. */
 message ProtoOATickData {
-    required int64 timestamp = 1; // Unix timestamp of the tick in milliseconds. See ProtoOAGetTickDataRes.tickData for details.
+    required int64 timestamp = 1; // The Unix time in milliseconds of the tick. See ProtoOAGetTickDataRes.tickData for details.
     required int64 tick = 2; // Tick price.
 }
 
@@ -594,8 +594,8 @@ message ProtoOACtidTraderAccount {
     required uint64 ctidTraderAccountId = 1; // Unique identifier of the trader's account. Used to match responses to trader's accounts.cTrader platform. Different brokers might have different ids
     optional bool isLive = 2; // If TRUE then the account is belong to Live environment and live host must be used to authorize it
     optional int64 traderLogin = 3; // TraderLogin for a specific account. Value is displayed on Client App UI
-    optional int64 lastClosingDealTimestamp = 4; // Timestamp of the last ProtoOAClosePositionDetail happened to this account.
-    optional int64 lastBalanceUpdateTimestamp = 5; // Timestamp of the last ProtoOADepositWithdraw happened to this account.
+    optional int64 lastClosingDealTimestamp = 4; // The Unix time in milliseconds of the last ProtoOAClosePositionDetail happened to this account.
+    optional int64 lastBalanceUpdateTimestamp = 5; // The Unix time in milliseconds of the last ProtoOADepositWithdraw happened to this account.
 }
 
 /** Asset class entity. */
@@ -615,9 +615,9 @@ message ProtoOADepthQuote {
 
 /** Margin call entity, specifies threshold for exact margin call type. Only 3 instances of margin calls are supported, identified by marginCallType. See ProtoOANotificationType for details. */
 message ProtoOAMarginCall {
-    required ProtoOANotificationType marginCallType = 1;
-    required double marginLevelThreshold = 2;
-    optional int64 utcLastUpdateTimestamp = 3;
+    required ProtoOANotificationType marginCallType = 1; // Type of margin call. All margin calls are similar, only difference is in marginLevelThreshold.
+    required double marginLevelThreshold = 2; // Margin level threshold for margin call.
+    optional int64 utcLastUpdateTimestamp = 3; // The Unix time in milliseconds of the last update of the margin call.
 }
 
 /** Type of notification, currently only 3 instances of marginCall are supported. */
@@ -629,10 +629,12 @@ enum ProtoOANotificationType {
 
 /** Error code ENUM. */
 enum ProtoOAErrorCode {
-    //Authorization
+    // Authorization
     OA_AUTH_TOKEN_EXPIRED = 1; // When token used for account authorization is expired.
     ACCOUNT_NOT_AUTHORIZED = 2; // When account is not authorized.
-    ALREADY_LOGGED_IN = 14; // When client tries to authorize after it was already authorized
+    RET_NO_SUCH_LOGIN = 12; // When such account no longer exists.
+    ALREADY_LOGGED_IN = 14; // When client tries to authorize after it was already authorized.
+    RET_ACCOUNT_DISABLED = 64; // When account is disabled.
     CH_CLIENT_AUTH_FAILURE = 101; // Open API client is not activated or wrong client credentials.
     CH_CLIENT_NOT_AUTHENTICATED = 102; // When a command is sent for not authorized Open API client.
     CH_CLIENT_ALREADY_AUTHENTICATED = 103; // Client is trying to authenticate twice.
@@ -641,7 +643,7 @@ enum ProtoOAErrorCode {
     CH_CTID_TRADER_ACCOUNT_NOT_FOUND = 106; // Trading account is not found.
     CH_OA_CLIENT_NOT_FOUND = 107; // Could not find this client id.
 
-    //General
+    // General
     REQUEST_FREQUENCY_EXCEEDED = 108; // Request frequency is reached.
     SERVER_IS_UNDER_MAINTENANCE = 109; // Server is under maintenance.
     CHANNEL_IS_BLOCKED = 110; // Operations are not allowed for this account.
@@ -649,14 +651,14 @@ enum ProtoOAErrorCode {
     WORSE_GSL_NOT_ALLOWED = 68; // Not allowed to increase risk for Positions with Guaranteed Stop Loss.
     SYMBOL_HAS_HOLIDAY = 69; // Trading disabled because symbol has holiday.
 
-    //Pricing
+    // Pricing
     NOT_SUBSCRIBED_TO_SPOTS = 112; // When trying to subscribe to depth, trendbars, etc. without spot subscription.
     ALREADY_SUBSCRIBED = 113; // When subscription is requested for an active.
     SYMBOL_NOT_FOUND = 114; // Symbol not found.
     UNKNOWN_SYMBOL = 115; // Note: to be merged with SYMBOL_NOT_FOUND.
     INCORRECT_BOUNDARIES = 35; // When requested period (from,to) is too large or invalid values are set to from/to.
 
-    //Trading
+    // Trading
     NO_QUOTES = 117; // Trading cannot be done as not quotes are available. Applicable for Book B.
     NOT_ENOUGH_MONEY = 118; // Not enough funds to allocate margin.
     MAX_EXPOSURE_REACHED = 119; // Max exposure limit is reached for a {trader, symbol, side}.
@@ -690,7 +692,7 @@ message ProtoOAHoliday {
     required string name = 2; // Name of holiday.
     optional string description = 3; // Description of holiday.
     required string scheduleTimeZone = 4; // Timezone used for holiday.
-    required int64 holidayDate = 5; // Amount of days from 01-01-1970, multiply it by 86400000 to get unix timestamp.
+    required int64 holidayDate = 5; // Amount of days from 1st Jan 1970, multiply it by 86400000 to get Unix time in milliseconds.
     required bool isRecurring = 6; // If TRUE, then the holiday happens each year.
     optional int32 startSecond = 7; // Amount of seconds from 00:00:00 of the holiday day when holiday actually starts.
     optional int32 endSecond = 8; // Amount of seconds from 00:00:00 of the holiday day when holiday actually finishes.

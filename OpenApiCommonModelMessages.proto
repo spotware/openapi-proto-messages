@@ -29,6 +29,6 @@ enum ProtoErrorCode {
     FRAME_TOO_LONG = 8; // Message is too large.
     MARKET_CLOSED = 9; // Market is closed.
     CONCURRENT_MODIFICATION = 10; // Order is blocked (e.g. under execution) and change cannot be applied.
-    BLOCKED_PAYLOAD_TYPE = 11; // Message is blocked by server.
+    BLOCKED_PAYLOAD_TYPE = 11; // Message is blocked by server or rate limit is reached.
 }
 
