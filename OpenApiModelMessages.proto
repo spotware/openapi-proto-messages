@@ -116,7 +116,7 @@ message ProtoOASymbol {
     required int32 digits = 2; // Number of price digits to be displayed.
     required int32 pipPosition = 3; // Pip position on digits.
     optional bool enableShortSelling = 4; // If TRUE then the short selling with the symbol is enabled.
-    optional bool guaranteedStopLoss = 5; // If TRUE then setting of guaranteedStopLoss is available for limited risk accounts.
+    optional bool guaranteedStopLoss = 5; // If TRUE then setting of guaranteedStopLoss is allowed for the symbol.
     optional ProtoOADayOfWeek swapRollover3Days = 6 [default = MONDAY]; // Day of the week when SWAP charge amount will be tripled. Doesn't impact Rollover Commission.
     optional double swapLong = 7; // SWAP charge for long positions.
     optional double swapShort = 8; // SWAP charge for short positions.
