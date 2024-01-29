@@ -116,7 +116,7 @@ message ProtoOASymbol {
     required int32 digits = 2; // Number of price digits to be displayed.
     required int32 pipPosition = 3; // Pip position on digits.
     optional bool enableShortSelling = 4; // If TRUE then the short selling with the symbol is enabled.
-    optional bool guaranteedStopLoss = 5; // If TRUE then setting of guaranteedStopLoss is allowed for the symbol.
+    optional bool guaranteedStopLoss = 5; // If TRUE then setting of guaranteedStopLoss is available for limited risk accounts.
     optional ProtoOADayOfWeek swapRollover3Days = 6 [default = MONDAY]; // Day of the week when SWAP charge amount will be tripled. Doesn't impact Rollover Commission.
     optional double swapLong = 7; // SWAP charge for long positions.
     optional double swapShort = 8; // SWAP charge for short positions.
@@ -230,6 +230,7 @@ enum ProtoOATradingMode {
 enum ProtoOASwapCalculationType {
     PIPS = 0; //Specifies type of SWAP computation as PIPS (0)
     PERCENTAGE = 1; //Specifies type of SWAP computation as PERCENTAGE (1, annual, in percent)
+    POINTS = 2; // Specifies type of SWAP computation as POINTS (2)
 }
 
 /** Enum for specifying access right for a trader. */
@@ -273,10 +274,11 @@ message ProtoOATrader {
     optional ProtoOAAccountType accountType = 15 [default = HEDGED]; // Account type: HEDGED, NETTED, etc.
     optional string brokerName = 16; // Some whitelabel assigned to trader by broker at the moment of account creation.
     optional int64 registrationTimestamp = 17; // The Unix timestamp in milliseconds of the account registration. Should be used as minimal date in historical data requests.
-    optional bool isLimitedRisk = 18; // If TRUE then account is compliant to use specific margin calculation strategy.
+    optional bool isLimitedRisk = 18; // If TRUE then account is compliant to use specific margin calculation strategy. Such accounts are require to have guaranteed stop loss on all positions.
     optional ProtoOALimitedRiskMarginCalculationStrategy limitedRiskMarginCalculationStrategy = 19 [default = ACCORDING_TO_LEVERAGE]; // Special strategy used in margin calculations for this account (if account isLimitedRisk).
     optional uint32 moneyDigits = 20; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects balance, managerBonus, ibBonus, nonWithdrawableBonus.
     optional bool fairStopOut = 21; // If TRUE - Position is fully closed on Stop Out, if FALSE - smart (partial closing) Stop Out is applied, if unspecified  - Stop Out format is determined by Broker.
+    optional ProtoOAStopOutStrategy stopOutStrategy = 22 [default = MOST_MARGIN_USED_FIRST]; //The Stop Out strategy that is used for this Trader. The Trader can change the value in the cTrader UI if this option is not disabled by the Broker
 }
 
 /** Position status ENUM. */
@@ -596,6 +598,7 @@ message ProtoOACtidTraderAccount {
     optional int64 traderLogin = 3; // TraderLogin for a specific account. Value is displayed on Client App UI
     optional int64 lastClosingDealTimestamp = 4; // The Unix time in milliseconds of the last ProtoOAClosePositionDetail happened to this account.
     optional int64 lastBalanceUpdateTimestamp = 5; // The Unix time in milliseconds of the last ProtoOADepositWithdraw happened to this account.
+    optional string brokerTitleShort = 6; // The name of the broker to which the account belongs to. Shortened to be displayed in the UI.
 }
 
 /** Asset class entity. */
@@ -712,4 +715,9 @@ message ProtoOAPositionUnrealizedPnL {
     required int64 positionId = 1; // The position ID.
     required int64 grossUnrealizedPnL = 2; // The gross unrealized PnL of the position denoted in the account deposit currency.
     required int64 netUnrealizedPnL = 3; // The net unrealized PnL of the position denoted in the account deposit currency. It does not include potential closing commission.
+}
+
+enum ProtoOAStopOutStrategy {//The strategy for choosing which Position to close during a Stop Out
+    MOST_MARGIN_USED_FIRST = 0; //A Stop Out strategy that closes a Position with the largest Used Margin
+    MOST_LOSING_FIRST = 1; //A Stop Out strategy that closes a Position with the least PnL
 }
