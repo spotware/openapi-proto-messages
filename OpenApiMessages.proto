@@ -476,7 +476,7 @@ message ProtoOASpotEvent {
     optional uint64 bid = 4; // Bid price. Specified in 1/100_000 of unit of a price. (e.g. 1.23 -> 123_000)
     optional uint64 ask = 5; // Ask price. Specified in 1/100_000 of unit of a price.
     repeated ProtoOATrendbar trendbar = 6; // Returns live trend bar. Requires subscription on the trend bars.
-    optional uint64 sessionClose = 7;// Last session close. Specified in 1/100_000 of unit of a price.
+    optional uint64 sessionClose = 7;// Last session close.
     optional int64 timestamp = 8; // The Unix time for spot.
 }
 
