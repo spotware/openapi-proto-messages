@@ -48,6 +48,7 @@ message ProtoOAErrorRes {
     required string errorCode = 3; // The name of the ProtoErrorCode or the other custom ErrorCodes (e.g. ProtoCHErrorCode).
     optional string description = 4; // The error description.
     optional int64 maintenanceEndTimestamp = 5; // The Unix time in seconds when the current maintenance session will be ended.
+    optional uint64 retryAfter = 6; // When you hit rate limit with errorCode=BLOCKED_PAYLOAD_TYPE, this field will contain amount of seconds until related payload type will be unlocked.
 }
 
 /** Event that is sent when the connection with the client application is cancelled by the server. All the sessions for the traders' accounts will be terminated. */
