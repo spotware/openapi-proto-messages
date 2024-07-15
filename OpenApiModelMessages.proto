@@ -100,6 +100,11 @@ enum ProtoOAPayloadType {
     PROTO_OA_DEAL_OFFSET_LIST_RES = 2186;
     PROTO_OA_GET_POSITION_UNREALIZED_PNL_REQ = 2187;
     PROTO_OA_GET_POSITION_UNREALIZED_PNL_RES = 2188;
+    PROTO_OA_V1_PNL_CHANGE_EVENT = 2189;
+    PROTO_OA_V1_PNL_CHANGE_SUBSCRIBE_REQ = 2190;
+    PROTO_OA_V1_PNL_CHANGE_SUBSCRIBE_RES = 2191;
+    PROTO_OA_V1_PNL_CHANGE_UN_SUBSCRIBE_REQ = 2192;
+    PROTO_OA_V1_PNL_CHANGE_UN_SUBSCRIBE_RES = 2193;
 }
 
 /** Asset entity. */
@@ -354,7 +359,7 @@ message ProtoOAPosition {
 /** Position/order trading details entity. */
 message ProtoOATradeData {
     required int64 symbolId = 1; // The unique identifier of the symbol in specific server environment within cTrader platform. Different brokers might have different IDs.
-    required int64 volume = 2; // Volume in cents.
+    required int64 volume = 2; // Volume in cents (e.g. 1000 in protocol means 10.00 units).
     required ProtoOATradeSide tradeSide = 3; // Buy, Sell.
     optional int64 openTimestamp = 4; // The Unix time in milliseconds when position was opened or order was created.
     optional string label = 5; // Text label specified during order request.
@@ -372,7 +377,7 @@ message ProtoOAOrder {
     required ProtoOAOrderStatus orderStatus = 4; // Order status.
     optional int64 expirationTimestamp = 6; // The Unix time in milliseconds of expiration if the order has time in force GTD.
     optional double executionPrice = 7; // Price at which an order was executed. For order with FILLED status.
-    optional int64 executedVolume = 8; // Part of the volume that was filled.
+    optional int64 executedVolume = 8; // Part of the volume that was filled in cents (e.g. 1000 in protocol means 10.00 units).
     optional int64 utcLastUpdateTimestamp = 9; // The Unix time in milliseconds of the last update of the order.
     optional double baseSlippagePrice = 10; // Used for Market Range order with combination of slippageInPoints to specify price range were order can be executed.
     optional int64 slippageInPoints = 11; // Used for Market Range and STOP_LIMIT orders to to specify price range were order can be executed.
@@ -384,8 +389,8 @@ message ProtoOAOrder {
     optional string clientOrderId = 17; // Optional ClientOrderId. Max Length = 50 chars.
     optional ProtoOATimeInForce timeInForce = 18 [default = IMMEDIATE_OR_CANCEL]; // Order's time in force. Depends on order type.
     optional int64 positionId = 19; // ID of the position linked to the order (e.g. closing order, order that increase volume of a specific position, etc.).
-    optional int64 relativeStopLoss = 20; // Relative stopLoss that can be specified instead of absolute as one. Specified in 1/100_000 of unit of a price. For BUY stopLoss = entryPrice - relativeStopLoss, for SELL stopLoss = entryPrice + relativeStopLoss.
-    optional int64 relativeTakeProfit = 21; // Relative takeProfit that can be specified instead of absolute one. Specified in 1/100_000 of unit of a price. ForBUY takeProfit = entryPrice + relativeTakeProfit, for SELL takeProfit = entryPrice - relativeTakeProfit.
+    optional int64 relativeStopLoss = 20; // Relative stopLoss that can be specified instead of absolute as one. Specified in 1/100000 of unit of a price. (e.g. 123000 in protocol means 1.23, 53423782 means 534.23782) For BUY stopLoss = entryPrice - relativeStopLoss, for SELL stopLoss = entryPrice + relativeStopLoss.
+    optional int64 relativeTakeProfit = 21; // Relative takeProfit that can be specified instead of absolute one. Specified in 1/100000 of unit of a price. (e.g. 123000 in protocol means 1.23, 53423782 means 534.23782) ForBUY takeProfit = entryPrice + relativeTakeProfit, for SELL takeProfit = entryPrice - relativeTakeProfit.
     optional bool isStopOut = 22; // If TRUE then order was stopped out from server side.
     optional bool trailingStopLoss = 23; // If TRUE then order is trailingStopLoss. Valid for STOP_LOSS_TAKE_PROFIT order.
     optional ProtoOAOrderTriggerMethod stopTriggerMethod = 24 [default = TRADE]; // Trigger method for the order. Valid only for STOP and STOP_LIMIT orders.
@@ -682,6 +687,7 @@ enum ProtoOAErrorCode {
     UNABLE_TO_CANCEL_ORDER = 134; // Unable to cancel order.
     UNABLE_TO_AMEND_ORDER = 135; // Unable to amend order.
     SHORT_SELLING_NOT_ALLOWED = 136; // Short selling is not allowed.
+    NOT_SUBSCRIBED_TO_PNL = 137;//This session is not subscribed via ProtoOAv1PnLChangeSubscribeReq
 }
 
 enum ProtoOALimitedRiskMarginCalculationStrategy {
