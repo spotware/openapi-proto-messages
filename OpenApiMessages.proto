@@ -637,7 +637,7 @@ message ProtoOAAccountLogoutReq {
     required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
 }
 
-/** Response to the ProtoOATraderLogoutReq request. Actual logout of trading account will be completed on ProtoOAAccountDisconnectEvent. */
+/** Response to the ProtoOAAccountLogoutReq request. Actual logout of trading account will be completed on ProtoOAAccountDisconnectEvent. */
 message ProtoOAAccountLogoutRes {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ACCOUNT_LOGOUT_RES];
 
