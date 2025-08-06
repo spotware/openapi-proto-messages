@@ -91,8 +91,8 @@ message ProtoOANewOrderReq {
     optional double stopPrice = 8; // Stop Price, can be specified for the STOP and the STOP_LIMIT orders only.
     optional ProtoOATimeInForce timeInForce = 9 [default = GOOD_TILL_CANCEL]; // The specific order execution or expiration instruction - GOOD_TILL_DATE, GOOD_TILL_CANCEL, IMMEDIATE_OR_CANCEL, FILL_OR_KILL, MARKET_ON_OPEN.
     optional int64 expirationTimestamp = 10; // The Unix time in milliseconds of Order expiration. Should be set for the Good Till Date orders.
-    optional double stopLoss = 11; // The absolute Stop Loss price (1.23456 for example). Not supported for the MARKER orders.
-    optional double takeProfit = 12; // The absolute Take Profit price (1.23456 for example). Unsupported for the MARKER orders.
+    optional double stopLoss = 11; // The absolute Stop Loss price (1.23456 for example). Not supported for MARKET orders.
+    optional double takeProfit = 12; // The absolute Take Profit price (1.23456 for example). Unsupported for MARKET orders.
     optional string comment = 13; // User-specified comment. MaxLength = 512.
     optional double baseSlippagePrice = 14; // Base price to calculate relative slippage price for MARKET_RANGE order.
     optional int32 slippageInPoints = 15; // Slippage distance for MARKET_RANGE and STOP_LIMIT order.
@@ -139,8 +139,8 @@ message ProtoOAAmendOrderReq {
     optional double limitPrice = 5; // The Limit Price, can be specified for the LIMIT order only.
     optional double stopPrice = 6; // The Stop Price, can be specified for the STOP and the STOP_LIMIT orders.
     optional int64 expirationTimestamp = 7; // The Unix timestamp in milliseconds of Order expiration. Should be set for the Good Till Date orders.
-    optional double stopLoss = 8; // The absolute Stop Loss price (e.g. 1.23456). Not supported for the MARKER orders.
-    optional double takeProfit = 9; // The absolute Take Profit price (e.g. 1.23456). Not supported for the MARKER orders.
+    optional double stopLoss = 8; // The absolute Stop Loss price (e.g. 1.23456). Not supported for MARKET orders.
+    optional double takeProfit = 9; // The absolute Take Profit price (e.g. 1.23456). Not supported for MARKET orders.
     optional int32 slippageInPoints = 10; // Slippage distance for the MARKET_RANGE and the STOP_LIMIT orders.
     optional int64 relativeStopLoss = 11; // The relative Stop Loss can be specified instead of the absolute one. Specified in 1/100000 of a unit of price. (e.g. 123000 in protocol means 1.23, 53423782 means 534.23782) For BUY stopLoss = entryPrice - relativeStopLoss, for SELL stopLoss = entryPrice + relativeStopLoss.
     optional int64 relativeTakeProfit = 12; // The relative Take Profit can be specified instead of the absolute one. Specified in 1/100000 of a unit of price. (e.g. 123000 in protocol means 1.23, 53423782 means 534.23782) For BUY takeProfit = entryPrice + relativeTakeProfit, for SELL takeProfit = entryPrice - relativeTakeProfit.
@@ -637,7 +637,7 @@ message ProtoOAAccountLogoutReq {
     required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
 }
 
-/** Response to the ProtoOATraderLogoutReq request. Actual logout of trading account will be completed on ProtoOAAccountDisconnectEvent. */
+/** Response to the ProtoOAAccountLogoutReq request. Actual logout of trading account will be completed on ProtoOAAccountDisconnectEvent. */
 message ProtoOAAccountLogoutRes {
     optional ProtoOAPayloadType payloadType = 1 [default = PROTO_OA_ACCOUNT_LOGOUT_RES];
 
@@ -792,37 +792,4 @@ message ProtoOAGetPositionUnrealizedPnLRes {
     required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
     repeated ProtoOAPositionUnrealizedPnL positionUnrealizedPnL = 3; // Information about trader's positions' unrealized PnLs.
     required uint32 moneyDigits = 4; // Specifies the exponent of various monetary values. E.g., moneyDigits = 8 should be interpreted as the value multiplied by 10^8 with the 'real' value equal to 10053099944 / 10^8 = 100.53099944. Affects positionUnrealizedPnL.grossUnrealizedPnL, positionUnrealizedPnL.netUnrealizedPnL.
-}
-
-// The event that is sent when the unrealized PnL is changed due to market movement. Requires subscribing to PnL events, see ProtoOAv1PnLChangeSubscribeReq
-message ProtoOAv1PnLChangeEvent {
-	optional ProtoOAPayloadType payloadType = 1	[default = PROTO_OA_V1_PNL_CHANGE_EVENT];
-	required int64 ctidTraderAccountId = 2; //Unique identifier of the trader's account. Used to match responses to trader's accounts.
-	required int64 grossUnrealizedPnL = 3; //The gross unrealized PnL denoted in the account deposit currency
-	required int64 netUnrealizedPnL = 4; //The net unrealized PnL denoted in the account deposit currency
-	required uint32 moneyDigits = 5; //Specifies the exponent of various monetary values. E.g., moneyDigits = 8 should be interpreted as the value multiplied by 10^8 with the 'real' value equal to 10053099944 / 10^8 = 100.53099944
-}
-
-//The request to subscribe to ProtoOAv1PnLChangeEvent
-message ProtoOAv1PnLChangeSubscribeReq {
-	optional ProtoOAPayloadType payloadType = 1	[default = PROTO_OA_V1_PNL_CHANGE_SUBSCRIBE_REQ];
-	required int64 ctidTraderAccountId = 2; //Unique identifier of the trader's account. Used to match responses to trader's accounts.
-}
-
-//The response for ProtoOAv1PnLChangeSubscribeReq
-message ProtoOAv1PnLChangeSubscribeRes {
-	optional ProtoOAPayloadType payloadType = 1	[default = PROTO_OA_V1_PNL_CHANGE_SUBSCRIBE_RES];
-	required int64 ctidTraderAccountId = 2; // The unique identifier of the trader's account in cTrader platform.
-}
-
-//The request to stop an existing subscription to PnL events. The subscriber who sends this request will stop receiving ProtoOAv1PnLChangeEvent
-message ProtoOAv1PnLChangeUnSubscribeReq {
-	optional ProtoOAPayloadType payloadType = 1	[default = PROTO_OA_V1_PNL_CHANGE_UN_SUBSCRIBE_REQ];
-	required int64 ctidTraderAccountId = 2; //Unique identifier of the trader's account. Used to match responses to trader's accounts.
-}
-
-//The response for ProtoOAv1PnLChangeUnSubscribeReq
-message ProtoOAv1PnLChangeUnSubscribeRes {
-	optional ProtoOAPayloadType payloadType = 1	[default = PROTO_OA_V1_PNL_CHANGE_UN_SUBSCRIBE_RES];
-	required int64 ctidTraderAccountId = 2; //Unique identifier of the trader's account. Used to match responses to trader's accounts.
 }
