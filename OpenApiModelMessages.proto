@@ -682,7 +682,6 @@ enum ProtoOAErrorCode {
     UNABLE_TO_CANCEL_ORDER = 134; // Unable to cancel order.
     UNABLE_TO_AMEND_ORDER = 135; // Unable to amend order.
     SHORT_SELLING_NOT_ALLOWED = 136; // Short selling is not allowed.
-    NOT_SUBSCRIBED_TO_PNL = 137;//This session is not subscribed via ProtoOAv1PnLChangeSubscribeReq
 }
 
 enum ProtoOALimitedRiskMarginCalculationStrategy {
