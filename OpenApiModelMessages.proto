@@ -323,7 +323,7 @@ enum ProtoOAOrderStatus {
     ORDER_STATUS_CANCELLED = 5; // Order is cancelled. Might be valid for orders with partially filled volume that were cancelled by LP.
 }
 
-/** Stop Order and Stop Lost triggering method ENUM. */
+/** Stop Order and Stop Loss triggering method ENUM. */
 enum ProtoOAOrderTriggerMethod {
     TRADE = 1; // Stop Order: buy is triggered by ask, sell by bid; Stop Loss Order: for buy position is triggered by bid and for sell position by ask.
     OPPOSITE = 2; // Stop Order: buy is triggered by bid, sell by ask; Stop Loss Order: for buy position is triggered by ask and for sell position by bid.
