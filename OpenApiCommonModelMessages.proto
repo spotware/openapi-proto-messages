@@ -11,6 +11,7 @@ option java_outer_classname = "ContainerCommonModelMessages";
 // --- INTENSIVE COMMANDS 1 - 49
 // --- COMMON API 50 - 69
 enum ProtoPayloadType {
+    PAYLOAD_TYPE_UNSPECIFIED = 0;
     // common intensive
     PROTO_MESSAGE = 5;
     // common commands
@@ -20,6 +21,7 @@ enum ProtoPayloadType {
 
 // COMMON error codes 1 - 99
 enum ProtoErrorCode {
+    ERROR_CODE_UNSPECIFIED = 0;
     UNKNOWN_ERROR = 1; // Generic error.
     UNSUPPORTED_MESSAGE = 2; // Message is not supported. Wrong message.
     INVALID_REQUEST = 3; // Generic error.  Usually used when input value is not correct.
