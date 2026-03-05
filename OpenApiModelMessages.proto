@@ -11,6 +11,7 @@ option java_package = "com.xtrader.protocol.openapi.v2.model";
 option java_outer_classname = "ContainerOpenApiV2ModelMessages";
 
 enum ProtoOAPayloadType {
+    OA_PAYLOAD_TYPE_UNSPECIFIED = 0;
     PROTO_OA_APPLICATION_AUTH_REQ = 2100;
     PROTO_OA_APPLICATION_AUTH_RES = 2101;
     PROTO_OA_ACCOUNT_AUTH_REQ = 2102;
@@ -200,6 +201,7 @@ message ProtoOAInterval {
 
 /** Enum for specifying type of trading commission. */
 enum ProtoOACommissionType {
+    COMMISSION_TYPE_UNSPECIFIED = 0;
     USD_PER_MILLION_USD = 1; // USD per million USD volume - usually used for FX. Example: 50 USD for 1 mil USD of trading volume.
     USD_PER_LOT = 2; // USD per 1 lot - usually used for CFDs and futures for commodities, and indices. Example: 15 USD for 1 contract.
     PERCENTAGE_OF_VALUE = 3; // Percentage of trading volume - usually used for Equities. Example: 0.005% of notional trading volume. Multiplied by 100,000.
@@ -208,12 +210,14 @@ enum ProtoOACommissionType {
 
 /** Enum for specifying stop loss and take profit distances. */
 enum ProtoOASymbolDistanceType {
+    SYMBOL_DISTANCE_TYPE_UNSPECIFIED = 0;
     SYMBOL_DISTANCE_IN_POINTS = 1;
     SYMBOL_DISTANCE_IN_PERCENTAGE = 2;
 }
 
 /** Enum for specifying type of minimum trading commission. */
 enum ProtoOAMinCommissionType {
+    MIN_COMMISSION_TYPE_UNSPECIFIED = 0;
     CURRENCY = 1;
     QUOTE_CURRENCY = 2;
 }
@@ -283,6 +287,7 @@ message ProtoOATrader {
 
 /** Position status ENUM. */
 enum ProtoOAPositionStatus {
+    POSITION_STATUS_UNSPECIFIED = 0;
     POSITION_STATUS_OPEN = 1;
     POSITION_STATUS_CLOSED = 2;
     POSITION_STATUS_CREATED = 3; // Empty position is created for pending order.
@@ -291,12 +296,14 @@ enum ProtoOAPositionStatus {
 
 /** Trader side ENUM. Used for order, position, deal. */
 enum ProtoOATradeSide {
+    TRADE_SIDE_UNSPECIFIED = 0;
     BUY = 1;
     SELL = 2;
 }
 
 /** Order type ENUM. */
 enum ProtoOAOrderType {
+    ORDER_TYPE_UNSPECIFIED = 0;
     MARKET = 1;
     LIMIT = 2;
     STOP = 3;
@@ -307,6 +314,7 @@ enum ProtoOAOrderType {
 
 /** Order's time in force ENUM. */
 enum ProtoOATimeInForce {
+    TIME_IN_FORCE_UNSPECIFIED = 0;
     GOOD_TILL_DATE = 1;
     GOOD_TILL_CANCEL = 2;
     IMMEDIATE_OR_CANCEL = 3;
@@ -316,6 +324,7 @@ enum ProtoOATimeInForce {
 
 /** Order status ENUM. */
 enum ProtoOAOrderStatus {
+    ORDER_STATUS_UNSPECIFIED = 0;
     ORDER_STATUS_ACCEPTED = 1; // Order request validated and accepted for execution.
     ORDER_STATUS_FILLED = 2; // Order is fully filled.
     ORDER_STATUS_REJECTED = 3; // Order is rejected due to validation.
@@ -325,6 +334,7 @@ enum ProtoOAOrderStatus {
 
 /** Stop Order and Stop Loss triggering method ENUM. */
 enum ProtoOAOrderTriggerMethod {
+    ORDER_TRIGGER_METHOD_UNSPECIFIED = 0;
     TRADE = 1; // Stop Order: buy is triggered by ask, sell by bid; Stop Loss Order: for buy position is triggered by bid and for sell position by ask.
     OPPOSITE = 2; // Stop Order: buy is triggered by bid, sell by ask; Stop Loss Order: for buy position is triggered by ask and for sell position by bid.
     DOUBLE_TRADE = 3; // The same as TRADE, but trigger is checked after the second consecutive tick.
@@ -393,6 +403,7 @@ message ProtoOAOrder {
 
 /** Execution event type ENUM. */
 enum ProtoOAExecutionType {
+    EXECUTION_TYPE_UNSPECIFIED = 0;
     ORDER_ACCEPTED = 2; // Order passed validation.
     ORDER_FILLED = 3; // Order filled.
     ORDER_REPLACED = 4; // Pending order is changed with a new one.
@@ -510,6 +521,7 @@ message ProtoOADealOffset {
 
 /** Deal status ENUM. */
 enum ProtoOADealStatus {
+    DEAL_STATUS_UNSPECIFIED = 0;
     FILLED = 2; // Deal filled.
     PARTIALLY_FILLED = 3; // Deal is partially filled.
     REJECTED = 4; // Deal is correct but was rejected by liquidity provider (e.g. no liquidity).
@@ -534,6 +546,7 @@ message ProtoOAClosePositionDetail {
 
 /** Trendbar period ENUM. */
 enum ProtoOATrendbarPeriod {
+    TRENDBAR_PERIOD_UNSPECIFIED = 0;
     M1 = 1;
     M2 = 2;
     M3 = 3;
@@ -570,6 +583,7 @@ message ProtoOAExpectedMargin {
 
 /** Price quote type. */
 enum ProtoOAQuoteType {
+    QUOTE_TYPE_UNSPECIFIED = 0;
     BID = 1;
     ASK = 2;
 }
@@ -625,6 +639,7 @@ message ProtoOAMarginCall {
 
 /** Type of notification, currently only 3 instances of marginCall are supported. */
 enum ProtoOANotificationType {
+    NOTIFICATION_TYPE_UNSPECIFIED = 0;
     MARGIN_LEVEL_THRESHOLD_1 = 61; // one of three margin calls, they are all similar.
     MARGIN_LEVEL_THRESHOLD_2 = 62; // one of three margin calls, they are all similar.
     MARGIN_LEVEL_THRESHOLD_3 = 63; // one of three margin calls, they are all similar.
@@ -632,6 +647,7 @@ enum ProtoOANotificationType {
 
 /** Error code ENUM. */
 enum ProtoOAErrorCode {
+    OA_ERROR_CODE_UNSPECIFIED = 0;
     // Authorization
     OA_AUTH_TOKEN_EXPIRED = 1; // When token used for account authorization is expired.
     ACCOUNT_NOT_AUTHORIZED = 2; // When account is not authorized.
