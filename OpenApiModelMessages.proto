@@ -100,6 +100,16 @@ enum ProtoOAPayloadType {
     PROTO_OA_DEAL_OFFSET_LIST_RES = 2186;
     PROTO_OA_GET_POSITION_UNREALIZED_PNL_REQ = 2187;
     PROTO_OA_GET_POSITION_UNREALIZED_PNL_RES = 2188;
+    PROTO_OA_V1_PNL_CHANGE_EVENT = 2189;
+    PROTO_OA_V1_PNL_CHANGE_SUBSCRIBE_REQ = 2190;
+    PROTO_OA_V1_PNL_CHANGE_SUBSCRIBE_RES = 2191;
+    PROTO_OA_V1_PNL_CHANGE_UN_SUBSCRIBE_REQ = 2192;
+    PROTO_OA_V1_PNL_CHANGE_UN_SUBSCRIBE_RES = 2193;
+    PROTO_OA_V1_SUBSCRIBE_EXECUTION_EVENTS_REQ = 2194;
+    PROTO_OA_V1_SUBSCRIBE_EXECUTION_EVENTS_RES = 2195;
+    PROTO_OA_TRADER_GET_GSL_SCHEDULE_REQ = 2196;
+    PROTO_OA_TRADER_GET_GSL_SCHEDULE_RES = 2197;
+    PROTO_OA_GSL_SCHEDULE_CHANGED_EVENT = 2198;
 }
 
 /** Asset entity. */
@@ -152,6 +162,7 @@ message ProtoOASymbol {
     optional int32 skipSWAPPeriods = 38; // Count of swapPeriods before the first SWAP charge.
     optional bool chargeSwapAtWeekends = 39; // If enabled, SWAP will be charged for all days of the week, including Saturday and Sunday.
     optional string measurementUnits = 40;  // Specifies the units in which the base Asset of the Symbol is denominated.
+    optional uint64 gslScheduleId = 41;  // ID of related GSL Schedule Profile
 }
 
 /** Lightweight symbol entity. */
@@ -220,10 +231,10 @@ enum ProtoOAMinCommissionType {
 
 /** Enum for specifying symbol trading mode. */
 enum ProtoOATradingMode {
-    ENABLED = 0;
-    DISABLED_WITHOUT_PENDINGS_EXECUTION = 1;
-    DISABLED_WITH_PENDINGS_EXECUTION = 2;
-    CLOSE_ONLY_MODE = 3;
+    ENABLED = 0; // Full Access. The symbol can be freely traded.
+    DISABLED_WITHOUT_PENDINGS_EXECUTION = 1; // Close Only. It is impossible to open new positions for this symbol. Any previously open positions can still be closed.
+    DISABLED_WITH_PENDINGS_EXECUTION = 2; // Disallowed (with the execution of Pending Orders).	The symbol cannot be traded but any pending orders will still be executed.
+    CLOSE_ONLY_MODE = 3; // The symbol cannot be traded. Pending orders are automatically canceled.
 }
 
 /** Enum for specifying SWAP calculation type for symbol. */
@@ -255,6 +266,14 @@ enum ProtoOAAccountType {
     SPREAD_BETTING = 2; // Spread betting type account.
 }
 
+// Lifetime type of accounts
+enum ProtoOAAccountLifetimeType {
+  UNLIMITED = 1; // Default type for live accounts and subaccounts, exempt from expiration
+  LIMITED_INACTIVITY = 2; // Accounts that expire based on inactivity
+  LIMITED_CREATION = 3; // Accounts with a predefined lifespan from creation time
+  LIMITED_CREATION_FREE = 4; // Accounts with a predefined lifespan from creation time but are explicitly free for proprietary firms with deposit/withdrawal restrictions (it must be available only for servers with setting.PROP_TRADING != 0
+}
+
 /** Trading account entity. */
 message ProtoOATrader {
     required int64 ctidTraderAccountId = 1; // The unique Trader's Account ID used to match the responses to the Trader's Account.
@@ -279,6 +298,7 @@ message ProtoOATrader {
     optional uint32 moneyDigits = 20; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects balance, managerBonus, ibBonus, nonWithdrawableBonus.
     optional bool fairStopOut = 21; // If TRUE - Position is fully closed on Stop Out, if FALSE - smart (partial closing) Stop Out is applied, if unspecified  - Stop Out format is determined by Broker.
     optional ProtoOAStopOutStrategy stopOutStrategy = 22 [default = MOST_MARGIN_USED_FIRST]; //The Stop Out strategy that is used for this Trader. The Trader can change the value in the cTrader UI if this option is not disabled by the Broker
+    optional ProtoOAAccountLifetimeType accountLifetimeType = 23; // Lifetime account policy
 }
 
 /** Position status ENUM. */
@@ -323,12 +343,19 @@ enum ProtoOAOrderStatus {
     ORDER_STATUS_CANCELLED = 5; // Order is cancelled. Might be valid for orders with partially filled volume that were cancelled by LP.
 }
 
-/** Stop Order and Stop Loss triggering method ENUM. */
+/** Stop Order and Stop Lost triggering method ENUM. */
 enum ProtoOAOrderTriggerMethod {
     TRADE = 1; // Stop Order: buy is triggered by ask, sell by bid; Stop Loss Order: for buy position is triggered by bid and for sell position by ask.
     OPPOSITE = 2; // Stop Order: buy is triggered by bid, sell by ask; Stop Loss Order: for buy position is triggered by ask and for sell position by bid.
     DOUBLE_TRADE = 3; // The same as TRADE, but trigger is checked after the second consecutive tick.
     DOUBLE_OPPOSITE = 4; // The same as OPPOSITE, but trigger is checked after the second consecutive tick.
+}
+
+/** Contains data for advanced take profit. */
+message ProtoOAv1AdvancedTakeProfit {
+    optional int64 relativeTakeProfit = 1; // Relative price from position entry price. Exactly one of takeProfit / relativeTakeProfit must be filled
+    optional double takeProfit = 2; // Absolute price for take profit protection. Exactly one of takeProfit / relativeTakeProfit must be filled
+    required int64 volume = 3; // Volume of an additional protection order
 }
 
 /** Trade position entity. */
@@ -349,6 +376,8 @@ message ProtoOAPosition {
     optional ProtoOAOrderTriggerMethod stopLossTriggerMethod = 14 [default = TRADE]; // Stop trigger method for SL/TP of the position.
     optional uint32 moneyDigits = 15; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects swap, commission, mirroringCommission, usedMargin.
     optional bool trailingStopLoss = 16; //If TRUE then the Trailing Stop Loss is applied.
+    repeated ProtoOAv1AdvancedTakeProfit advancedTakeProfit = 17; // Contains data for advanced take profit.
+    optional ProtoOAv1BreakEvenProtection breakEvenProtection = 18; // Contains data for Break Even
 }
 
 /** Position/order trading details entity. */
@@ -389,6 +418,8 @@ message ProtoOAOrder {
     optional bool isStopOut = 22; // If TRUE then order was stopped out from server side.
     optional bool trailingStopLoss = 23; // If TRUE then order is trailingStopLoss. Valid for STOP_LOSS_TAKE_PROFIT order.
     optional ProtoOAOrderTriggerMethod stopTriggerMethod = 24 [default = TRADE]; // Trigger method for the order. Valid only for STOP and STOP_LIMIT orders.
+    repeated ProtoOAv1AdvancedTakeProfit advancedTakeProfit = 25; // Contains data for advanced take profit.
+    optional ProtoOAv1BreakEvenProtection breakEvenProtection = 26; // Contains data for Break Even
 }
 
 /** Execution event type ENUM. */
@@ -404,6 +435,10 @@ enum ProtoOAExecutionType {
     DEPOSIT_WITHDRAW = 10; // Type related to event of deposit or withdrawal cash flow operation.
     ORDER_PARTIAL_FILL = 11; // Order is partially filled.
     BONUS_DEPOSIT_WITHDRAW = 12; // Type related to event of bonus deposit or bonus withdrawal.
+    BREAK_EVEN_SET = 13; // Break Even added to open position (first time or promotion on fill). Sent only when subscribed by ProtoOAv1SubscribeExecutionEventsReq
+    BREAK_EVEN_UPDATED = 14; // Break Even values updated on open position. Sent only when subscribed by ProtoOAv1SubscribeExecutionEventsReq
+    BREAK_EVEN_CLEARED = 15; // Break Even cleared on open position (manual clear, auto on reversal, post-trigger clear). Sent only when subscribed by ProtoOAv1SubscribeExecutionEventsReq
+    BREAK_EVEN_TRIGGERED = 16; // BE fired → server created/replaced SLTP at BE stop (possibly clamped)
 }
 
 /** Bonus deposit/withdrawal entity. */
@@ -498,6 +533,9 @@ message ProtoOADeal {
     optional double baseToUsdConversionRate = 15; // Base to USD conversion rate on the time of deal execution.
     optional ProtoOAClosePositionDetail closePositionDetail = 16; // Closing position detail. Valid only for closing deal.
     optional uint32 moneyDigits = 17; // Specifies the exponent of the monetary values. E.g. moneyDigits = 8 must be interpret as business value multiplied by 10^8, then real balance would be 10053099944 / 10^8 = 100.53099944. Affects commission.
+    optional string label = 18; // Label field value from corresponding order. Used by cAlgo bots to identify its own orders. max length 100
+    optional string comment = 19; // Comment field value from corresponding order
+    optional string rejectReason = 20; // Reason why the deal was rejected
 }
 
 /** Deal details for ProtoOADealOffsetListReq. */
@@ -682,6 +720,7 @@ enum ProtoOAErrorCode {
     UNABLE_TO_CANCEL_ORDER = 134; // Unable to cancel order.
     UNABLE_TO_AMEND_ORDER = 135; // Unable to amend order.
     SHORT_SELLING_NOT_ALLOWED = 136; // Short selling is not allowed.
+    NOT_SUBSCRIBED_TO_PNL = 137;//This session is not subscribed via ProtoOAv1PnLChangeSubscribeReq
 }
 
 enum ProtoOALimitedRiskMarginCalculationStrategy {
@@ -711,6 +750,19 @@ message ProtoOADynamicLeverageTier {
     required int32 leverage = 2; // Applied leverage.
 }
 
+// GSL Schedule entity
+message ProtoOAGSLSchedule {
+    required int64 scheduleId = 1; // ID of GSL Schedule
+    required string name = 2; // Name of this GSL Schedule
+    repeated ProtoOAGSLScheduleTier tiers = 3; // List of (time -> multiplier) Schedule Tiers
+}
+
+// GSL Tier entity
+message ProtoOAGSLScheduleTier {
+    required int32 startTime = 1; // This Tier is active from startTime (Count of seconds from 00:00:00)
+    required int32 multiplier = 2; // Tier's multiplier (in percents): 34 means 34%
+}
+
 message ProtoOAPositionUnrealizedPnL {
     required int64 positionId = 1; // The position ID.
     required int64 grossUnrealizedPnL = 2; // The gross unrealized PnL of the position denoted in the account deposit currency.
@@ -720,4 +772,16 @@ message ProtoOAPositionUnrealizedPnL {
 enum ProtoOAStopOutStrategy {//The strategy for choosing which Position to close during a Stop Out
     MOST_MARGIN_USED_FIRST = 0; //A Stop Out strategy that closes a Position with the largest Used Margin
     MOST_LOSING_FIRST = 1; //A Stop Out strategy that closes a Position with the least PnL
+}
+
+/** Break Even protection. */
+message ProtoOAv1BreakEvenProtection {
+    required int64 triggerPricePips = 1; // Indicates number of pips from entry price to trigger Break Even protections
+    required int64 additionalDistancePips = 2; // When Break Even protections are triggered they are set at break even level + additionalDistancePips
+}
+
+enum ProtoOACrudOperation {
+    PROTO_OA_CREATE = 1;
+    PROTO_OA_UPDATE = 3;
+    PROTO_OA_DELETE = 4;
 }
